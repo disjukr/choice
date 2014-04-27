@@ -50,11 +50,13 @@ function Parent() {
             }
             if (index instanceof RegExp) {
                 var field = index.exec(__field__);
-                var value = __value__[i];
-                if (typeof value === 'function') {
-                    return value.bind(__this__, field);
+                if (field && (field.length > 0)) {
+                    var value = __value__[i];
+                    if (typeof value === 'function') {
+                        return value.bind(__this__, field);
+                    }
+                    return value;
                 }
-                return value;
             }
         }
         if (typeof __super__ !== 'undefined') {
@@ -94,11 +96,13 @@ function Child() {
             }
             if (index instanceof RegExp) {
                 var field = index.exec(__field__);
-                var value = __value__[i];
-                if (typeof value === 'function') {
-                    return value.bind(__this__, field);
+                if (field && (field.length > 0)) {
+                    var value = __value__[i];
+                    if (typeof value === 'function') {
+                        return value.bind(__this__, field);
+                    }
+                    return value;
                 }
-                return value;
             }
         }
         if (typeof __super__ !== 'undefined') {
