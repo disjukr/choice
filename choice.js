@@ -5,7 +5,7 @@ class Parent {
     }
     a(b) {
         return b;
-    };
+    }
     /abc/ = 'abc';
 }
 
@@ -18,12 +18,15 @@ class Child extends Parent {
     }
     x = 1;
     y = 2;
-    /xyz/ () {
+    /xyz/() {
         return field;
     }
 }
 
-new Child;
+var child = new Child;
+var object = {a: 'b'};
+var array = [1, 2, 3];
+console.log(child.xyz, object.a, array[0]);
 
 // after translation
 function Parent() {
@@ -39,6 +42,7 @@ function Parent() {
         'abc'
     ];
     __this__.__access__ = function (__field__) {
+        __field__ = __field__.toString();
         for (var i = 0; i < __index__.length; ++i) {
             var index = __index__[i];
             if (__field__ === index) {
@@ -59,7 +63,10 @@ function Parent() {
         return undefined;
     }
     __this__.__init__ = function (whoami) {
-        console.log(whoami);
+        (console.__access__ ?
+            console.__access__('log')(whoami) :
+            console['log'](whoami)
+        );
     }
 }
 
@@ -108,4 +115,18 @@ function Child() {
     }
 }
 
-(new Child()).__init__();
+var child = (new Child()).__init__();
+var object = {a: 'b'};
+var array = [1, 2, 3];
+(console.__access__ ?
+    console.__access__('log')(
+        (child.__access__ ? child.__access__('xyz') : child['xyz']),
+        (object.__access__ ? object.__access__('a') : object['a']),
+        (array.__access__ ? array.__access__('0') : array['0'])
+    ) :
+    console['log'](
+        (child.__access__ ? child.__access__('xyz') : child['xyz']),
+        (object.__access__ ? object.__access__('a') : object['a']),
+        (array.__access__ ? array.__access__('0') : array['0'])
+    )
+);
