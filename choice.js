@@ -28,6 +28,22 @@ var object = {a: 'b'};
 var array = [1, 2, 3];
 console.log(child.xyz, object.a, array[0]);
 
+var condition = true;
+if (condition) {
+    for (var item in object) {
+        console.log(item);
+    }
+    for a (var i = 0; i < 10; ++i) {
+        console.log(i);
+        while b (condition) {
+            loop c {
+                continue b while condition;
+            }
+            break a if condition;
+        }
+    }
+}
+
 // after translation
 function Parent() {
     var __this__ = this;
@@ -125,3 +141,23 @@ var array = [1, 2, 3];
     (object.__access__ ? object.__access__('a') : object['a']),
     (array.__access__ ? array.__access__('0') : array['0'])
 );
+
+var condition = true;
+if (condition) {
+    for (var item in object) {
+        console.log(item);
+    }
+    a: for (var i = 0; i < 10; ++i) {
+        console.log(i);
+        b: while (condition) {
+            c: while (true) {
+                if (condition) {
+                    continue b;
+                }
+            }
+            if (condition) {
+                break a;
+            }
+        }
+    }
+}
