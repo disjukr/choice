@@ -53,6 +53,8 @@ function Parent() {
     ];
     var __value__ = [
         function (b) {
+            var field = 'a';
+            var arguments = undefined;
             return b;
         },
         'abc'
@@ -96,11 +98,14 @@ function Child() {
     ];
     var __value__ = [
         function (b) {
+            var field = 'a';
+            var arguments = undefined;
             return __super__.__access__('a')(b);
         },
         1,
         2,
         function (field) {
+            var arguments = undefined;
             return field;
         }
     ];
