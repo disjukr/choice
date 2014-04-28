@@ -33,13 +33,17 @@ if (condition) {
     for (var item in object) {
         console.log(item);
     }
-    for a (var i = 0; i < 10; ++i) {
+    for a (var i = 0; i < 20; ++i) {
         console.log(i);
         while b (condition) {
             loop c {
-                continue b while condition;
+                if (i > 10)
+                    break b if condition;
+                else {
+                    ++i;
+                    continue c while condition;
+                }
             }
-            break a if condition;
         }
     }
 }
@@ -152,16 +156,21 @@ if (condition) {
     for (var item in object) {
         console.log(item);
     }
-    a: for (var i = 0; i < 10; ++i) {
+    a: for (var i = 0; i < 20; ++i) {
         console.log(i);
         b: while (condition) {
             c: while (true) {
-                if (condition) {
-                    continue b;
+                if (i > 10) {
+                    if (condition) {
+                        break b;
+                    }
                 }
-            }
-            if (condition) {
-                break a;
+                else {
+                    ++i;
+                    if (condition) {
+                        continue c;
+                    }
+                }
             }
         }
     }
