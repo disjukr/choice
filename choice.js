@@ -57,8 +57,7 @@ function Parent() {
     ];
     var __value__ = [
         function (b) {
-            var field = 'a';
-            var arguments = undefined;
+            var field = ['a'];
             return b;
         },
         'abc'
@@ -102,14 +101,15 @@ function Child() {
     ];
     var __value__ = [
         function (b) {
-            var field = 'a';
-            var arguments = undefined;
+            var field = ['a'];
             return __super__.__access__('a')(b);
         },
         1,
         2,
         function (field) {
-            var arguments = undefined;
+            var __callee__ = arguments.callee;
+            Array.prototype.shift.call(arguments);
+            arguments.callee = __callee__;
             return field;
         }
     ];
