@@ -48,6 +48,10 @@ if (condition) {
     }
 }
 
+for (var key, value in object) {
+    console.log(key, value);
+}
+
 try e {
     throw child if true;
 }
@@ -202,6 +206,11 @@ if (condition) {
             }
         }
     }
+}
+
+for (var key in object) {
+    var value = object[key];
+    console.log(key, value);
 }
 
 try {
