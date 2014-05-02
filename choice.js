@@ -48,6 +48,33 @@ if (condition) {
     }
 }
 
+try e {
+    throw child if true;
+}
+catch if e instanceof Parent {
+    console.log('parent');
+}
+catch if e instanceof Child {
+    console.log('child');
+}
+catch {
+    console.log(e);
+}
+finally {
+    console.log('fin');
+}
+
+try e {
+    throw 'err';
+}
+catch if false {
+    console.log('pass');
+}
+finally {
+    console.log('miss');
+}
+
+
 // after translation
 function Parent() {
     var __this__ = this;
@@ -140,6 +167,7 @@ function Child() {
         return __this__;
     }
 }
+Child.prototype = new Parent();
 
 var child = (new Child()).__init__();
 var object = {a: 'b'};
@@ -174,4 +202,39 @@ if (condition) {
             }
         }
     }
+}
+
+try {
+    if (true) {
+        throw child;
+    }
+}
+catch (e) {
+    if (e instanceof Parent) {
+        console.log('parent');
+    }
+    else if (e instanceof Child) {
+        console.log('child');
+    }
+    else {
+        console.log(e);
+    }
+}
+finally {
+    console.log('fin');
+}
+
+try {
+    throw 'err';
+}
+catch (e) {
+    if (false) {
+        console.log('pass');
+    }
+    else {
+        throw e;
+    }
+}
+finally {
+    console.log('miss');
 }
