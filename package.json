@@ -1,0 +1,23 @@
+{
+  "name": "choice",
+  "version": "0.0.0",
+  "description": "choi's programming language",
+  "main": "choice.js",
+  "bin": {
+    "chc": "cli.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://gist.github.com/64e55515b70dce275f13.git"
+  },
+  "keywords": [
+    "compile",
+    "language",
+    "javascript"
+  ],
+  "author": "JongChan Choi",
+  "license": "BSD"
+}
