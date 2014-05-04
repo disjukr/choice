@@ -1,6 +1,4 @@
-function tokenize() {
-    return ['if', '(', 'true', ')', '{', '}'];
-}
+var tokenize = require('./lexer.js');
 
 function parse(tokens) {
     return [{type: 'if', condition: true, statements: []}];
