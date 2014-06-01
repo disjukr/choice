@@ -10,6 +10,11 @@
         "rules": [
             ["{octal}|{hexadecimal}|{decimal}", "return 'NUMBER'"],
             ["true|false", "return 'BOOLEAN'"],
+            ["if\\b", "return 'IF'"],
+            ["else\\b", "return 'ELSE'"],
+            ["loop\\b", "return 'LOOP'"],
+            ["while\\b", "return 'WHILE'"],
+            ["for\\b", "return 'FOR'"],
             ["null", "return 'NULL'"],
             ["undefined", "return 'UNDEFINED'"],
             ["[$_A-Za-z][$_0-9A-Za-z]*", "return 'IDENTIFIER'"],
@@ -34,19 +39,28 @@
     "bnf": {
         "ast": [["statements", "return $1"]],
         "statement": [
-            ["expression ;", "$$ = $1"]
+            ["if_statement", "$$ = $1"],
+            ["else_statement", "$$ = $1"],
+            ["loop_statement", "$$ = $1"],
+            ["while_statement", "$$ = $1"],
+            ["for_statement", "$$ = $1"],
+            ["expression ;", "$$ = $1"],
+            [";", "$$ = $1"]
         ],
         "statements": [
             ["statement", "$$ = [$1]"],
             ["statements statement", "$1.push($2); $$ = $1"]
         ],
+        "block_statements": [
+            ["{ statements }", "$$ = $2"]
+        ],
         "value": [
-            ["BOOLEAN", "$$ = {type: 'value', value: $1}"],
-            ["NUMBER", "$$ = {type: 'value', value: $1}"],
-            ["STRING", "$$ = {type: 'value', value: $1}"]
+            ["BOOLEAN", "$$ = $1"],
+            ["NUMBER", "$$ = $1"],
+            ["STRING", "$$ = $1"]
         ],
         "expression": [
-            ["IDENTIFIER", "$$ = {type: 'identifier', name: $1}"],
+            ["IDENTIFIER", "$$ = $1"],
             ["value", "$$ = $1"],
             ["array", "$$ = $1"],
             ["object", "$$ = $1"],
@@ -56,6 +70,46 @@
         "array": [
             ["[ ]", "$$ = {type: 'array', contents: []}"],
             ["[ expression ]", "$$ = {type: 'array', contents: [$2]}"]
+        ],
+        "if_statement": [
+            [
+                "IF expression block_statements",
+                "$$ = {type: 'if', condition: $2, statements: $3}"
+            ],
+            [
+                "IF ( expression ) statement",
+                "$$ = {type: 'if', condition: $3, statements: [$5]}"
+            ]
+        ],
+        "else_statement": [
+            ["ELSE block_statements", "$$ = {type: 'else', statements: $2}"],
+            ["ELSE statement", "$$ = {type: 'else', statements: [$2]}"]
+        ],
+        "loop_statement": [
+            [
+                "LOOP block_statements",
+                "$$ = {type: 'loop', statements: $2}"
+            ],
+            [
+                "LOOP statement",
+                "$$ = {type: 'loop', statements: [$2]}"
+            ]
+        ],
+        "while_statement": [
+            [
+                "WHILE expression block_statements",
+                "$$ = {type: 'while', condition: $2, statements: $3}"
+            ],
+            [
+                "WHILE ( expression ) statement",
+                "$$ = {type: 'while', condition: $3, statements: [$5]}"
+            ]
+        ],
+        "for_statement": [
+            [
+                "FOR ( expression ; expression ; expression ) statement",
+                "$$ = {type: 'for', init: $3, cond: $5, loop: $7, statements: $9}"
+            ]
         ]
     }
 }
