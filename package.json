@@ -19,5 +19,8 @@
     "javascript"
   ],
   "author": "JongChan Choi",
-  "license": "BSD"
+  "license": "BSD",
+  "dependencies": {
+    "jison": "^0.4.13"
+  }
 }

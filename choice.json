@@ -1,0 +1,61 @@
+{
+    "comment": "The parser for Choi's programming language",
+    "author": "JongChan Choi",
+    "lex": {
+        "macros": {
+            "octal": "0[0-9]+",
+            "hexadecimal": "0[Xx][0-9A-Fa-f]+",
+            "decimal": "\\d*\\.?\\d+(?:[Ee](?:[+-]?\\d+)?)?"
+        },
+        "rules": [
+            ["{octal}|{hexadecimal}|{decimal}", "return 'NUMBER'"],
+            ["true|false", "return 'BOOLEAN'"],
+            ["null", "return 'NULL'"],
+            ["undefined", "return 'UNDEFINED'"],
+            ["[$_A-Za-z][$_0-9A-Za-z]*", "return 'IDENTIFIER'"],
+            ["===", "return '==='"],
+            ["==", "return '=='"],
+            ["=", "return '='"],
+            ["!", "return '!'"],
+            ["\\s+", ""],
+            ["\\{", "return '{'"],
+            ["\\}", "return '}'"],
+            ["\\[", "return '['"],
+            ["\\]", "return ']'"],
+            ["\\(", "return '('"],
+            ["\\)", "return ')'"],
+            ["\\?", "return '?'"],
+            [":", "return ':'"],
+            [";", "return ';'"],
+            ["\\.", "return '.'"]
+        ]
+    },
+    "start": "ast",
+    "bnf": {
+        "ast": [["statements", "return $1"]],
+        "statement": [
+            ["expression ;", "$$ = $1"]
+        ],
+        "statements": [
+            ["statement", "$$ = [$1]"],
+            ["statements statement", "$1.push($2); $$ = $1"]
+        ],
+        "value": [
+            ["BOOLEAN", "$$ = {type: 'value', value: $1}"],
+            ["NUMBER", "$$ = {type: 'value', value: $1}"],
+            ["STRING", "$$ = {type: 'value', value: $1}"]
+        ],
+        "expression": [
+            ["IDENTIFIER", "$$ = {type: 'identifier', name: $1}"],
+            ["value", "$$ = $1"],
+            ["array", "$$ = $1"],
+            ["object", "$$ = $1"],
+            ["function", "$$ = $1"],
+            ["( expression )", "$$ = $2"]
+        ],
+        "array": [
+            ["[ ]", "$$ = {type: 'array', contents: []}"],
+            ["[ expression ]", "$$ = {type: 'array', contents: [$2]}"]
+        ]
+    }
+}
