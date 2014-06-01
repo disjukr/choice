@@ -10,6 +10,8 @@
         "rules": [
             ["{octal}|{hexadecimal}|{decimal}", "return 'NUMBER'"],
             ["true|false", "return 'BOOLEAN'"],
+            ["var\\b", "return 'VAR'"],
+            ["const\\b", "return 'CONST'"],
             ["if\\b", "return 'IF'"],
             ["else\\b", "return 'ELSE'"],
             ["loop\\b", "return 'LOOP'"],
@@ -39,6 +41,8 @@
     "bnf": {
         "ast": [["statements", "return $1"]],
         "statement": [
+            ["var_statement", "$$ = $1"],
+            ["const_statement", "$$ = $1"],
             ["if_statement", "$$ = $1"],
             ["else_statement", "$$ = $1"],
             ["loop_statement", "$$ = $1"],
@@ -70,6 +74,26 @@
         "array": [
             ["[ ]", "$$ = {type: 'array', contents: []}"],
             ["[ expression ]", "$$ = {type: 'array', contents: [$2]}"]
+        ],
+        "var_statement": [
+            [
+                "VAR IDENTIFIER ;",
+                "$$ = {type: 'var', name: $2, value: undefined}"
+            ],
+            [
+                "VAR IDENTIFIER = expression ;",
+                "$$ = {type: 'var', name: $2, value: $4}"
+            ]
+        ],
+        "const_statement": [
+            [
+                "CONST IDENTIFIER ;",
+                "$$ = {type: 'const', name: $2, value: undefined}"
+            ],
+            [
+                "CONST IDENTIFIER = expression ;",
+                "$$ = {type: 'const', name: $2, value: $4}"
+            ]
         ],
         "if_statement": [
             [
@@ -108,7 +132,11 @@
         "for_statement": [
             [
                 "FOR ( expression ; expression ; expression ) statement",
-                "$$ = {type: 'for', init: $3, cond: $5, loop: $7, statements: $9}"
+                "$$ = {type: 'for', init: $3, cond: $5, loop: $7, statements: [$9]}"
+            ],
+            [
+                "FOR ( var_statement expression ; expression ) statement",
+                "$$ = {type: 'for', init: $3, cond: $4, loop: $6, statements: [$8]}"
             ]
         ]
     }
