@@ -11,7 +11,7 @@
             ["{octal}|{hexadecimal}|{decimal}", "return 'NUMBER'"],
             ["true|false", "return 'BOOLEAN'"],
             ["var\\b", "return 'VAR'"],
-            ["const\\b", "return 'CONST'"],
+            ["val\\b", "return 'VAL'"],
             ["if\\b", "return 'IF'"],
             ["else\\b", "return 'ELSE'"],
             ["loop\\b", "return 'LOOP'"],
@@ -20,6 +20,8 @@
             ["null", "return 'NULL'"],
             ["undefined", "return 'UNDEFINED'"],
             ["[$_A-Za-z][$_0-9A-Za-z]*", "return 'IDENTIFIER'"],
+            ["\\\\", "return '\\'"],
+            ["->", "return '->'"],
             ["===", "return '==='"],
             ["==", "return '=='"],
             ["=", "return '='"],
@@ -52,7 +54,7 @@
         "ast": [["statements", "return $1"]],
         "statement": [
             ["var_statement", "$$ = $1"],
-            ["const_statement", "$$ = $1"],
+            ["val_statement", "$$ = $1"],
             ["if_statement", "$$ = $1"],
             ["else_statement", "$$ = $1"],
             ["loop_statement", "$$ = $1"],
@@ -70,25 +72,54 @@
         ],
         "primary_expression": [
             ["IDENTIFIER", "$$ = $1"],
-            ["value", "$$ = $1"],
+            ["value", "$$ = $1"]
+        ],
+        "secondary_expression": [
+            ["primary_expression", "$$ = $1"],
             ["( expression )", "$$ = $2"]
         ],
         "expression": [
-            ["primary_expression", "$$ = $1"],
+            ["secondary_expression", "$$ = $1"],
             [
-                "expression , primary_expression",
+                "expression , secondary_expression",
                 "$$ = {type: ',', left: $1, right: $3}"
+            ]
+        ],
+        "parameters": [
+            ["IDENTIFIER", "$$ = [$1]"],
+            [
+                "parameters , IDENTIFIER",
+                "$1.push($3); $$ = $1"
             ]
         ],
         "value": [
             ["BOOLEAN", "$$ = $1"],
             ["NUMBER", "$$ = $1"],
             ["STRING", "$$ = $1"],
-            ["array_literal", "$$ = $1"]
+            ["array_literal", "$$ = $1"],
+            ["lambda_literal", "$$ = $1"]
         ],
         "array_literal": [
             ["[ ]", "$$ = {type: 'array', contents: []}"],
             ["[ expression ]", "$$ = {type: 'array', contents: [$2]}"]
+        ],
+        "lambda_literal": [
+            [
+                "\\ -> secondary_expression",
+                "$$ = {type: 'lambda', parameters: [], expression: $3}"
+            ],
+            [
+                "\\ block_statements",
+                "$$ = {type: 'block_lambda', parameters: [], statements: $2}"
+            ],
+            [
+                "\\ parameters -> secondary_expression",
+                "$$ = {type: 'lambda', parameters: $2, expression: $4}"
+            ],
+            [
+                "\\ parameters block_statements",
+                "$$ = {type: 'block_lambda', parameters: $2, statements: $3}"
+            ]
         ],
         "var_statement": [
             [
@@ -100,14 +131,14 @@
                 "$$ = {type: 'var', name: $2, value: $4}"
             ]
         ],
-        "const_statement": [
+        "val_statement": [
             [
-                "CONST IDENTIFIER ;",
-                "$$ = {type: 'const', name: $2, value: undefined}"
+                "VAL IDENTIFIER ;",
+                "$$ = {type: 'val', name: $2, value: undefined}"
             ],
             [
-                "CONST IDENTIFIER = expression ;",
-                "$$ = {type: 'const', name: $2, value: $4}"
+                "VAL IDENTIFIER = expression ;",
+                "$$ = {type: 'val', name: $2, value: $4}"
             ]
         ],
         "if_statement": [
