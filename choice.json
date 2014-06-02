@@ -23,7 +23,16 @@
             ["===", "return '==='"],
             ["==", "return '=='"],
             ["=", "return '='"],
+            ["!==", "return '!=='"],
+            ["!=", "return '!='"],
             ["!", "return '!'"],
+            [">>>", "return '>>>'"],
+            [">>", "return '>>'"],
+            [">=", "return '>='"],
+            [">", "return '>'"],
+            ["<<", "return '<<'"],
+            ["<=", "return '<='"],
+            ["<", "return '<'"],
             ["\\s+", ""],
             ["\\{", "return '{'"],
             ["\\}", "return '}'"],
@@ -34,6 +43,7 @@
             ["\\?", "return '?'"],
             [":", "return ':'"],
             [";", "return ';'"],
+            ["\\,", "return ','"],
             ["\\.", "return '.'"]
         ]
     },
@@ -58,20 +68,25 @@
         "block_statements": [
             ["{ statements }", "$$ = $2"]
         ],
+        "primary_expression": [
+            ["IDENTIFIER", "$$ = $1"],
+            ["value", "$$ = $1"],
+            ["( expression )", "$$ = $2"]
+        ],
+        "expression": [
+            ["primary_expression", "$$ = $1"],
+            [
+                "expression , primary_expression",
+                "$$ = {type: ',', left: $1, right: $3}"
+            ]
+        ],
         "value": [
             ["BOOLEAN", "$$ = $1"],
             ["NUMBER", "$$ = $1"],
-            ["STRING", "$$ = $1"]
+            ["STRING", "$$ = $1"],
+            ["array_literal", "$$ = $1"]
         ],
-        "expression": [
-            ["IDENTIFIER", "$$ = $1"],
-            ["value", "$$ = $1"],
-            ["array", "$$ = $1"],
-            ["object", "$$ = $1"],
-            ["function", "$$ = $1"],
-            ["( expression )", "$$ = $2"]
-        ],
-        "array": [
+        "array_literal": [
             ["[ ]", "$$ = {type: 'array', contents: []}"],
             ["[ expression ]", "$$ = {type: 'array', contents: [$2]}"]
         ],
