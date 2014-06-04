@@ -21,7 +21,6 @@
             ["undefined", "return 'UNDEFINED'"],
             ["[$_A-Za-z][$_0-9A-Za-z]*", "return 'IDENTIFIER'"],
             ["\\\\", "return '\\'"],
-            ["->", "return '->'"],
             ["===", "return '==='"],
             ["==", "return '=='"],
             ["=", "return '='"],
@@ -72,17 +71,32 @@
         ],
         "primary_expression": [
             ["IDENTIFIER", "$$ = $1"],
-            ["value", "$$ = $1"]
-        ],
-        "secondary_expression": [
-            ["primary_expression", "$$ = $1"],
+            ["value", "$$ = $1"],
             ["( expression )", "$$ = $2"]
         ],
-        "expression": [
-            ["secondary_expression", "$$ = $1"],
+        "postfix_expression": [
+            ["primary_expression", "$$ = $1"],
             [
-                "expression , secondary_expression",
+                "postfix_expression [ expression ]",
+                "$$ = {type: 'access', expression: $1, field: $3}"
+            ],
+            [
+                "postfix_expression . IDENTIFIER",
+                "$$ = {type: 'access', expression: $1, field: $3}"
+            ]
+        ],
+        "expression": [
+            ["postfix_expression", "$$ = $1"],
+            [
+                "expression , postfix_expression",
                 "$$ = {type: ',', left: $1, right: $3}"
+            ]
+        ],
+        "arguments": [
+            ["postfix_expression", "$$ = [$1]"],
+            [
+                "arguments , postfix_expression",
+                "$1.push($3); $$ = $1"
             ]
         ],
         "parameters": [
@@ -101,20 +115,12 @@
         ],
         "array_literal": [
             ["[ ]", "$$ = {type: 'array', contents: []}"],
-            ["[ expression ]", "$$ = {type: 'array', contents: [$2]}"]
+            ["[ arguments ]", "$$ = {type: 'array', contents: $2}"]
         ],
         "lambda_literal": [
             [
-                "\\ -> secondary_expression",
-                "$$ = {type: 'lambda', parameters: [], expression: $3}"
-            ],
-            [
                 "\\ block_statements",
                 "$$ = {type: 'block_lambda', parameters: [], statements: $2}"
-            ],
-            [
-                "\\ parameters -> secondary_expression",
-                "$$ = {type: 'lambda', parameters: $2, expression: $4}"
             ],
             [
                 "\\ parameters block_statements",
