@@ -92,6 +92,23 @@
                 "$$ = {type: ',', left: $1, right: $3}"
             ]
         ],
+        "key_value_pair": [
+            [
+                "IDENTIFIER : postfix_expression",
+                "$$ = {type: 'member', key: $1, value: $3}"
+            ],
+            [
+                "STRING : postfix_expression",
+                "$$ = {type: 'member', key: $1, value: $3}"
+            ]
+        ],
+        "members": [
+            ["key_value_pair", "$$ = [$1]"],
+            [
+                "members , key_value_pair",
+                "$1.push($3); $$ = $1"
+            ]
+        ],
         "arguments": [
             ["postfix_expression", "$$ = [$1]"],
             [
@@ -110,8 +127,13 @@
             ["BOOLEAN", "$$ = $1"],
             ["NUMBER", "$$ = $1"],
             ["STRING", "$$ = $1"],
+            ["object_literal", "$$ = $1"],
             ["array_literal", "$$ = $1"],
             ["lambda_literal", "$$ = $1"]
+        ],
+        "object_literal": [
+            ["{ }", "$$ = {type: 'object', members: []}"],
+            ["{ members }", "$$ = {type: 'object', members: $2}"]
         ],
         "array_literal": [
             ["[ ]", "$$ = {type: 'array', contents: []}"],
