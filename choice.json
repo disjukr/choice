@@ -19,8 +19,8 @@
             ["for\\b", "return 'FOR'"],
             ["null", "return 'NULL'"],
             ["undefined", "return 'UNDEFINED'"],
+            ["returns?|->", "return 'RETURN'"],
             ["[$_A-Za-z][$_0-9A-Za-z]*", "return 'IDENTIFIER'"],
-            ["->", "return '->'"],
             ["===", "return '==='"],
             ["==", "return '=='"],
             ["=", "return '='"],
@@ -141,12 +141,12 @@
         ],
         "lambda_literal": [
             [
-                "( ) -> postfix_expression",
-                "$$ = {type: 'lambda', parameters: [], statements: [$4]}"
+                "( ) RETURN postfix_expression",
+                "$$ = {type: 'lambda', parameters: [], expression: $4}"
             ],
             [
-                "( parameters ) -> postfix_expression",
-                "$$ = {type: 'lambda', parameters: $2, statements: [$5]}"
+                "( parameters ) RETURN postfix_expression",
+                "$$ = {type: 'lambda', parameters: $2, expression: $5}"
             ],
             [
                 "( parameters ) block_statements",

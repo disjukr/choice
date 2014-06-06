@@ -22,6 +22,15 @@ transform['object'] = function (node) {
     return '{' + node.members.map(transform).join(',') + '}';
 };
 
+transform['lambda'] = function (node) {
+    return [
+        'function (', node.parameters.map(transform).join(','), ')',
+        '{',
+        'return ', transform(node.expression),
+        '}'
+    ].join('');
+};
+
 transform['val'] = function (node) {
     return [
         'const ',
