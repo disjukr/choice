@@ -185,6 +185,10 @@
             [
                 "IF ( expression ) statement",
                 "$$ = {type: 'if', condition: $3, statements: [$5]}"
+            ],
+            [
+                "IF ( expression ) block_statements",
+                "$$ = {type: 'if', condition: $3, statements: $5}"
             ]
         ],
         "else_statement": [

@@ -1,5 +1,4 @@
 exports.compile = function (ast) {
-    // throw typeof ast;
     return transform(ast);
 };
 
@@ -34,5 +33,10 @@ transform['val'] = function (node) {
 };
 
 transform['if'] = function (node) {
-    //
+    return [
+        'if (', transform(node.condition), ')',
+        '{',
+        transform(node.statements),
+        '}'
+    ].join('');
 };
