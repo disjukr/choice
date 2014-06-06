@@ -20,7 +20,7 @@
             ["null", "return 'NULL'"],
             ["undefined", "return 'UNDEFINED'"],
             ["[$_A-Za-z][$_0-9A-Za-z]*", "return 'IDENTIFIER'"],
-            ["\\\\", "return '\\'"],
+            ["->", "return '->'"],
             ["===", "return '==='"],
             ["==", "return '=='"],
             ["=", "return '='"],
@@ -119,12 +119,20 @@
         ],
         "lambda_literal": [
             [
-                "\\ block_statements",
-                "$$ = {type: 'block_lambda', parameters: [], statements: $2}"
+                "( ) -> postfix_expression",
+                "$$ = {type: 'lambda', parameters: [], statements: [$4]}"
             ],
             [
-                "\\ parameters block_statements",
-                "$$ = {type: 'block_lambda', parameters: $2, statements: $3}"
+                "( parameters ) -> postfix_expression",
+                "$$ = {type: 'lambda', parameters: $2, statements: [$5]}"
+            ],
+            [
+                "( parameters ) block_statements",
+                "$$ = {type: 'block_lambda', parameters: $2, statements: $4}"
+            ],
+            [
+                "( ) block_statements",
+                "$$ = {type: 'block_lambda', parameters: [], statements: $3}"
             ]
         ],
         "var_statement": [
