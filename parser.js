@@ -1,5 +1,15 @@
 var Parser = require('jison').Parser;
 var parser = new Parser(require('./choice.json'));
 require('fs').writeFileSync(__dirname + '/temp.js', parser.generate());
-var result = parser.parse('val a = {a: 1, b: 3};');
-console.log(require('util').inspect(result, false, 10));
+
+console.log('===== SOURCE =====');
+var source = 'val a = {a: 1, b: 3};'
+console.log(source);
+
+console.log('===== AST =====');
+var ast = parser.parse(source);
+console.log(require('util').inspect(ast, false, 10));
+
+console.log('===== RESULT =====');
+var js = require('./compiler.js').compile(ast);
+console.log(js);
