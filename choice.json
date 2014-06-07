@@ -85,7 +85,7 @@
             ],
             [
                 "postfix_expression . IDENTIFIER",
-                "$$ = {type: 'access', expression: $1, field: $3}"
+                "$$ = {type: 'access', expression: $1, field: '\"' + $3 + '\"'}"
             ],
             [
                 "postfix_expression ( arguments )",
