@@ -14,6 +14,15 @@ function transform(node) {
     return node + '';
 }
 
+transform['call'] = function (node) {
+    return [
+        transform(node.callee),
+        '(',
+        node.arguments.map(transform).join(','),
+        ')'
+    ].join('');
+};
+
 transform['member'] = function (node) {
     return node.key + ':' + transform(node.value);
 };
