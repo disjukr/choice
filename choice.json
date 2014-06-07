@@ -92,20 +92,23 @@
                 "$$ = {type: 'call', callee: $1, arguments: $3}"
             ]
         ],
+        "expression_without_comma": [
+            ["postfix_expression", "$$ = $1"]
+        ],
         "expression": [
-            ["postfix_expression", "$$ = $1"],
+            ["expression_without_comma", "$$ = $1"],
             [
-                "expression , postfix_expression",
+                "expression , expression_without_comma",
                 "$$ = {type: ',', left: $1, right: $3}"
             ]
         ],
         "key_value_pair": [
             [
-                "IDENTIFIER : postfix_expression",
+                "IDENTIFIER : expression_without_comma",
                 "$$ = {type: 'member', key: $1, value: $3}"
             ],
             [
-                "STRING : postfix_expression",
+                "STRING : expression_without_comma",
                 "$$ = {type: 'member', key: $1, value: $3}"
             ]
         ],
@@ -117,9 +120,9 @@
             ]
         ],
         "arguments": [
-            ["postfix_expression", "$$ = [$1]"],
+            ["expression_without_comma", "$$ = [$1]"],
             [
-                "arguments , postfix_expression",
+                "arguments , expression_without_comma",
                 "$1.push($3); $$ = $1"
             ]
         ],
@@ -148,11 +151,11 @@
         ],
         "lambda_literal": [
             [
-                "( ) RETURN postfix_expression",
+                "( ) RETURN expression_without_comma",
                 "$$ = {type: 'lambda', parameters: [], expression: $4}"
             ],
             [
-                "( parameters ) RETURN postfix_expression",
+                "( parameters ) RETURN expression_without_comma",
                 "$$ = {type: 'lambda', parameters: $2, expression: $5}"
             ],
             [
