@@ -3,7 +3,7 @@ var parser = new Parser(require('./choice.json'));
 require('fs').writeFileSync(__dirname + '/temp.js', parser.generate());
 
 console.log('===== SOURCE =====');
-var source = 'val a = (a, b, c) -> a;'
+var source = 'val hello = "Hello, World!"; // comment is ignored'
 console.log(source);
 
 console.log('===== AST =====');
