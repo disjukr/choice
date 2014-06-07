@@ -88,6 +88,10 @@
                 "$$ = {type: 'access', expression: $1, field: '\"' + $3 + '\"'}"
             ],
             [
+                "postfix_expression ( )",
+                "$$ = {type: 'call', callee: $1, arguments: []}"
+            ],
+            [
                 "postfix_expression ( arguments )",
                 "$$ = {type: 'call', callee: $1, arguments: $3}"
             ]
