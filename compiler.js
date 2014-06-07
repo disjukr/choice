@@ -60,6 +60,16 @@ transform['lambda'] = function (node) {
     ].join('');
 };
 
+transform['var'] = function (node) {
+    return [
+        'var ',
+        node.name,
+        ' = ',
+        transform(node.value),
+        ';'
+    ].join('');
+};
+
 transform['val'] = function (node) {
     return [
         'const ',
