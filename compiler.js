@@ -36,7 +36,7 @@ transform['access'] = function (node) {
 
 transform['call'] = function (node) {
     return [
-        '(', transform(node.callee), ')',
+        transform(node.callee),
         '(',
         node.arguments.map(transform).join(','),
         ')'
@@ -53,10 +53,12 @@ transform['object'] = function (node) {
 
 transform['lambda'] = function (node) {
     return [
+        '(',
         'function (', node.parameters.map(transform).join(','), ')',
         '{',
         'return ', transform(node.expression),
-        '}'
+        '}',
+        ')'
     ].join('');
 };
 
@@ -86,5 +88,11 @@ transform['if'] = function (node) {
         '{',
         transform(node.statements),
         '}'
+    ].join('');
+};
+
+transform['typeof'] = function (node) {
+    return [
+        '(', 'typeof ', transform(node.expression), ')'
     ].join('');
 };

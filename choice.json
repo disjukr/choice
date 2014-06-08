@@ -21,6 +21,7 @@
             ["null", "return 'NULL'"],
             ["undefined", "return 'UNDEFINED'"],
             ["returns?|->", "return 'RETURN'"],
+            ["typeof", "return 'TYPEOF'"],
             ["[$_A-Za-z][$_0-9A-Za-z]*", "return 'IDENTIFIER'"],
             ["\\s+", ""],
             ["(?:\\/\\/|#).*(?=\\r\\n|\\n|$)", ""],
@@ -96,8 +97,15 @@
                 "$$ = {type: 'call', callee: $1, arguments: $3}"
             ]
         ],
+        "prefix_expression": [
+            ["postfix_expression", "$$ = $1"],
+            [
+                "TYPEOF prefix_expression",
+                "$$ = {type: 'typeof', expression: $2}"
+            ]
+        ],
         "expression_without_comma": [
-            ["postfix_expression", "$$ = $1"]
+            ["prefix_expression", "$$ = $1"]
         ],
         "expression": [
             ["expression_without_comma", "$$ = $1"],
@@ -141,6 +149,8 @@
             ["BOOLEAN", "$$ = $1"],
             ["NUMBER", "$$ = $1"],
             ["STRING", "$$ = $1"],
+            ["NULL", "$$ = $1"],
+            ["UNDEFINED", "$$ = $1"],
             ["object_literal", "$$ = $1"],
             ["array_literal", "$$ = $1"],
             ["lambda_literal", "$$ = $1"]
