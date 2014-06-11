@@ -1,18 +1,8 @@
-var tokenize = require('./lexer.js');
+var Parser = require('jison').Parser;
+var parser = new Parser(require('./choice.json'));
+var compiler = require('./compiler.js');
 
-function parse(tokens) {
-    return [{type: 'if', condition: true, statements: []}];
-}
-
-function compile(ast) {
-    return 'if (true) {}'
-}
-
-function translate(sourceCode) {
-    var tokens = tokenize(sourceCode);
-    var ast = parse(tokens);
-    var code = compile(ast);
-    return code;
-}
-
-module.exports.translate = translate;
+module.exports.compile = function (source) {
+    var ast = parser.parse(source);
+    return compiler.compile(ast);
+};

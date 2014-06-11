@@ -14,7 +14,7 @@ argv.forEach(function (arg) {
     var dir = path.dirname(p);
     var base = path.basename(p, '.ch');
     var source = fs.readFileSync(p, {encoding: 'utf8'});
-    var result = choice.translate(source);
+    var result = choice.compile(source);
     var resultPath = path.join(dir, base + '.js');
     fs.writeFileSync(resultPath, result, {encoding: 'utf8'});
 });
