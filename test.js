@@ -3,7 +3,7 @@ var parser = new Parser(require('./choice.json'));
 require('fs').writeFileSync(__dirname + '/temp.js', parser.generate());
 
 console.log('===== SOURCE =====');
-var source = '[1, 2, 3];';
+var source = 'var helloRegex = /hello/i; helloRegex.test("Hello, Regex!");';
 console.log(source);
 
 console.log('===== AST =====');
