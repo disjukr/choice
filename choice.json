@@ -26,6 +26,11 @@
             ["\\s+", ""],
             ["(?:\\/\\/|#).*(?=\\r\\n|\\n|$)", ""],
             ["\\/\\*([^*]|[\\r\\n]|(\\*+([^*/]|[\\r\\n])))*\\*+\\/", ""],
+            ["\\+\\+", "return '++'"],
+            ["\\+", "return '+'"],
+            ["--", "return '--'"],
+            ["-", "return '-'"],
+            ["~", "return '~'"],
             ["===", "return '==='"],
             ["==", "return '=='"],
             ["=", "return '='"],
@@ -78,23 +83,34 @@
             ["value", "$$ = $1"],
             ["( expression )", "$$ = $2"]
         ],
-        "postfix_expression": [
+        "access_call_expression": [
             ["primary_expression", "$$ = $1"],
             [
-                "postfix_expression [ expression ]",
+                "access_call_expression [ expression ]",
                 "$$ = {type: 'access', expression: $1, field: $3}"
             ],
             [
-                "postfix_expression . IDENTIFIER",
+                "access_call_expression . IDENTIFIER",
                 "$$ = {type: 'access', expression: $1, field: '\"' + $3 + '\"'}"
             ],
             [
-                "postfix_expression ( )",
+                "access_call_expression ( )",
                 "$$ = {type: 'call', callee: $1, arguments: []}"
             ],
             [
-                "postfix_expression ( arguments )",
+                "access_call_expression ( arguments )",
                 "$$ = {type: 'call', callee: $1, arguments: $3}"
+            ]
+        ],
+        "postfix_expression": [
+            ["access_call_expression", "$$ = $1"],
+            [
+                "postfix_expression ++",
+                "$$ = {type: 'post++', expression: $1}"
+            ],
+            [
+                "postfix_expression --",
+                "$$ = {type: 'post--', expression: $1}"
             ]
         ],
         "prefix_expression": [
@@ -102,6 +118,30 @@
             [
                 "TYPEOF prefix_expression",
                 "$$ = {type: 'typeof', expression: $2}"
+            ],
+            [
+                "~ prefix_expression",
+                "$$ = {type: 'pre~', expression: $2}"
+            ],
+            [
+                "! prefix_expression",
+                "$$ = {type: 'pre!', expression: $2}"
+            ],
+            [
+                "+ prefix_expression",
+                "$$ = {type: 'pre+', expression: $2}"
+            ],
+            [
+                "- prefix_expression",
+                "$$ = {type: 'pre-', expression: $2}"
+            ],
+            [
+                "++ prefix_expression",
+                "$$ = {type: 'pre++', expression: $2}"
+            ],
+            [
+                "-- prefix_expression",
+                "$$ = {type: 'pre--', expression: $2}"
             ]
         ],
         "expression_without_comma": [

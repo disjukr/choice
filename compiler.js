@@ -9,90 +9,147 @@ function transform(node) {
     if (typeof node === 'object') {
         if (node instanceof Array) {
             return node.map(function (node) {
-                return transform(node);
-            }).join(';');
+                return indent() + transform(node);
+            }).join(';\n') + ';\n';
         }
         return transform[node.type](node);
     }
     return node + '';
 }
 
+function indent(op) {
+    switch (op) {
+    case '+':
+        ++indent.level;
+        return indent();
+    case '-':
+        var keep = indent();
+        --indent.level;
+        return keep;
+    case '{': case '(': case '[':
+        ++indent.level;
+        return op + '\n';
+    case '}': case ')': case ']':
+        --indent.level;
+        return indent() + op;
+    default:
+        return (new Array(indent.level + 1)).join('  ');
+    }
+}
+indent.level = 0;
+
 transform['access'] = function (node) {
+    var access = transform(node.expression);
+    var field = transform(node.field);
     return [
-        '(\n',
-        '__choice_access__ = ', transform(node.expression), ',\n',
-        '__choice_field__ = ', transform(node.field), ',\n',
-        '__choice_member__ = (',
-        '__choice_access__.__access__ ?\n',
-        '__choice_access__.__access__(__choice_field__) :\n',
-        '__choice_access__[__choice_field__]\n',
-        '),\n',
-        '(typeof __choice_member__ === "function") ?\n',
-        '__choice_member__.bind(__choice_access__) :\n',
-        '__choice_member__',
-        '\n)'
+        indent('('),
+        indent(), '__choice_access__ = ', access, ',\n',
+        indent(), '__choice_field__ = ', field, ',\n',
+        indent(), '__choice_member__ = ',
+        indent('('),
+        indent(), '__choice_access__.__access__ ?\n',
+        indent('+'), '__choice_access__.__access__(__choice_field__) :\n',
+        indent('-'), '__choice_access__[__choice_field__]\n',
+        indent(')'), ',\n',
+        indent(), '(typeof __choice_member__ === "function") ?\n',
+        indent('+'), '__choice_member__.bind(__choice_access__) :\n',
+        indent('-'), '__choice_member__\n',
+        indent(')')
     ].join('');
 };
 
 transform['call'] = function (node) {
+    var callee = transform(node.callee);
+    var arguments = node.arguments.map(transform).join(',');
     return [
-        transform(node.callee),
-        '(',
-        node.arguments.map(transform).join(','),
-        ')'
+        callee, '(', arguments, ')'
     ].join('');
 };
 
 transform['member'] = function (node) {
-    return node.key + ':' + transform(node.value);
+    return node.key + ': ' + transform(node.value);
 };
 
 transform['object'] = function (node) {
-    return '{' + node.members.map(transform).join(',') + '}';
+    return [
+        indent('{'),
+            node.members.map(function (member) {
+                return indent() + transform(member);
+            }).join(',\n'), '\n',
+        indent('}')
+    ].join('');
 };
 
 transform['lambda'] = function (node) {
+    var parameters = node.parameters.map(transform).join(', ');
+    var result = transform(node.expression);
     return [
-        '(',
-        'function (', node.parameters.map(transform).join(','), ')',
-        '{',
-        'return ', transform(node.expression),
-        '}',
-        ')'
+        '(', 'function (', parameters, ') ', indent('{'),
+            indent(), 'return ', result, ';\n',
+        indent('}'), ')'
     ].join('');
 };
 
 transform['var'] = function (node) {
     return [
-        'var ',
-        node.name,
-        ' = ',
-        transform(node.value),
-        ';'
+        'var ', node.name, ' = ', transform(node.value)
     ].join('');
 };
 
 transform['val'] = function (node) {
     return [
-        'const ',
-        node.name,
-        ' = ',
-        transform(node.value),
-        ';'
+        'const ', node.name, ' = ', transform(node.value)
     ].join('');
 };
 
 transform['if'] = function (node) {
     return [
-        'if (', transform(node.condition), ')',
-        '{',
-        transform(node.statements),
-        '}'
+        'if (', transform(node.condition), ') ', indent('{'),
+            transform(node.statements),
+        indent('}')
     ].join('');
+};
+
+transform[','] = function (node) {
+    var left = transform(node.left);
+    var right = transform(node.right);
+    return left + ', ' + right;
 };
 
 transform['typeof'] = function (node) {
     return [
         '(', 'typeof ', transform(node.expression), ')'
     ].join('');
+};
+
+transform['pre~'] = function (node) {
+    return '~' + transform(node.expression);
+};
+
+transform['pre!'] = function (node) {
+    return '!' + transform(node.expression);
+};
+
+transform['pre+'] = function (node) {
+    return '+' + transform(node.expression);
+};
+
+transform['pre-'] = function (node) {
+    return '-' + transform(node.expression);
+};
+
+transform['pre++'] = function (node) {
+    return '++' + transform(node.expression);
+};
+
+transform['pre--'] = function (node) {
+    return '--' + transform(node.expression);
+};
+
+transform['post++'] = function (node) {
+    return transform(node.expression) + '++';
+};
+
+transform['post--'] = function (node) {
+    return transform(node.expression) + '--';
 };

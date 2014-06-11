@@ -3,7 +3,7 @@ var parser = new Parser(require('./choice.json'));
 require('fs').writeFileSync(__dirname + '/temp.js', parser.generate());
 
 console.log('===== SOURCE =====');
-var source = 'typeof undefined;';
+var source = 'var a = {b: {c: 1}, d: (e) -> !-~++e}; a.d(a.b.c);';
 console.log(source);
 
 console.log('===== AST =====');
