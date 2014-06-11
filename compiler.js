@@ -80,6 +80,16 @@ transform['object'] = function (node) {
     ].join('');
 };
 
+transform['array'] = function (node) {
+    return [
+        indent('['),
+            node.contents.map(function (item) {
+                return indent() + transform(item);
+            }).join(',\n'), '\n',
+        indent(']')
+    ].join('');
+};
+
 transform['lambda'] = function (node) {
     var parameters = node.parameters.map(transform).join(', ');
     var result = transform(node.expression);
