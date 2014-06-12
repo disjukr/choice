@@ -27,6 +27,9 @@
             ["\\s+", ""],
             ["(?:\\/\\/|#).*(?=\\r\\n|\\n|$)", ""],
             ["\\/\\*([^*]|[\\r\\n]|(\\*+([^*/]|[\\r\\n])))*\\*+\\/", ""],
+            ["\\*", "return '*'"],
+            ["/", "return '/'"],
+            ["%", "return '%'"],
             ["\\+\\+", "return '++'"],
             ["\\+", "return '+'"],
             ["--", "return '--'"],
@@ -145,8 +148,23 @@
                 "$$ = {type: 'pre--', expression: $2}"
             ]
         ],
+        "multiplicative_expression": [
+            ["prefix_expression", "$$ = $1"],
+            [
+                "multiplicative_expression * prefix_expression",
+                "$$ = {type: '*', left: $1, right: $3}"
+            ],
+            [
+                "multiplicative_expression / prefix_expression",
+                "$$ = {type: '/', left: $1, right: $3}"
+            ],
+            [
+                "multiplicative_expression % prefix_expression",
+                "$$ = {type: '%', left: $1, right: $3}"
+            ]
+        ],
         "expression_without_comma": [
-            ["prefix_expression", "$$ = $1"]
+            ["multiplicative_expression", "$$ = $1"]
         ],
         "expression": [
             ["expression_without_comma", "$$ = $1"],

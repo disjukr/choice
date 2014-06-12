@@ -163,3 +163,15 @@ transform['post++'] = function (node) {
 transform['post--'] = function (node) {
     return transform(node.expression) + '--';
 };
+
+transform['*'] = function (node) {
+    return transform(node.left) + ' * ' + transform(node.right);
+};
+
+transform['/'] = function (node) {
+    return transform(node.left) + ' / ' + transform(node.right);
+};
+
+transform['%'] = function (node) {
+    return transform(node.left) + ' % ' + transform(node.right);
+};

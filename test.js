@@ -3,7 +3,7 @@ var parser = new Parser(require('./choice.json'));
 require('fs').writeFileSync(__dirname + '/temp.js', parser.generate());
 
 console.log('===== SOURCE =====');
-var source = 'var helloRegex = /hello/i; helloRegex.test("Hello, Regex!");';
+var source = '1 * +2 / 3 % -4;';
 console.log(source);
 
 console.log('===== AST =====');
