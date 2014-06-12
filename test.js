@@ -3,7 +3,7 @@ var parser = new Parser(require('./choice.json'));
 require('fs').writeFileSync(__dirname + '/temp.js', parser.generate());
 
 console.log('===== SOURCE =====');
-var source = 'func a { -> 1; }';
+var source = 'func double(a) -> 2a;';
 console.log(source);
 
 console.log('===== AST =====');
