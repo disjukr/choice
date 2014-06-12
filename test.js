@@ -3,7 +3,7 @@ var parser = new Parser(require('./choice.json'));
 require('fs').writeFileSync(__dirname + '/temp.js', parser.generate());
 
 console.log('===== SOURCE =====');
-var source = 'loop label { break label if true; }';
+var source = 'console."log"("Hello, World!");';
 console.log(source);
 
 console.log('===== AST =====');

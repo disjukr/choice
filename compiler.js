@@ -1,9 +1,14 @@
-exports.compile = function (ast) {
-    return [
-        'var __choice_access__, __choice_field__, __choice_member__;',
+exports.compile = compile;
+function compile(ast) {
+    var fragments = [
         transform(ast)
-    ].join('\n');
+    ];
+    if (compile.choice_access)
+        fragments.unshift('var __choice_access__, __choice_field__, __choice_member__;');
+    compile.choice_access = false;
+    return fragments.join('\n');
 };
+compile.choice_access = false;
 
 function transform(node) {
     if (typeof node === 'object') {
@@ -42,7 +47,8 @@ function indent(op) {
 indent.unit = '  ';
 indent.level = 0;
 
-transform['access'] = function (node) {
+transform['choice_access'] = function (node) {
+    compile.choice_access = true;
     var access = transform(node.expression);
     var field = transform(node.field);
     return [
@@ -60,6 +66,18 @@ transform['access'] = function (node) {
         indent('-'), '__choice_member__\n',
         indent(')')
     ].join('');
+};
+
+transform['access'] = function (node) {
+    var access = transform(node.expression);
+    var field = transform(node.field);
+    return access + '[' + field + ']';
+};
+
+transform['dot_access'] = function (node) {
+    var access = transform(node.expression);
+    var field = transform(node.field);
+    return access + '.' + field;
 };
 
 transform['call'] = function (node) {

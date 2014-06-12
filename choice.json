@@ -60,7 +60,8 @@
             [":", "return ':'"],
             [";", "return ';'"],
             ["\\,", "return ','"],
-            ["\\.", "return '.'"]
+            ["\\.", "return '.'"],
+            ["`", "return '`'"]
         ]
     },
     "start": "ast",
@@ -93,12 +94,28 @@
         "access_call_expression": [
             ["primary_expression", "$$ = $1"],
             [
+                "access_call_expression ` STRING",
+                "$$ = {type: 'choice_access', expression: $1, field: $3}"
+            ],
+            [
+                "access_call_expression ` IDENTIFIER",
+                "$$ = {type: 'choice_access', expression: $1, field: '\"' + $3 + '\"'}"
+            ],
+            [
+                "access_call_expression ` [ expression ]",
+                "$$ = {type: 'choice_access', expression: $1, field: $4}"
+            ],
+            [
                 "access_call_expression [ expression ]",
                 "$$ = {type: 'access', expression: $1, field: $3}"
             ],
             [
+                "access_call_expression . STRING",
+                "$$ = {type: 'access', expression: $1, field: $3}"
+            ],
+            [
                 "access_call_expression . IDENTIFIER",
-                "$$ = {type: 'access', expression: $1, field: '\"' + $3 + '\"'}"
+                "$$ = {type: 'dot_access', expression: $1, field: $3}"
             ],
             [
                 "access_call_expression ( )",
