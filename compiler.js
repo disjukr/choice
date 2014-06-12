@@ -120,6 +120,21 @@ transform['if'] = function (node) {
     ].join('');
 };
 
+transform['else'] = function (node) {
+    return [
+        'else ', indent('{'),
+            transform(node.statements),
+        indent('}')
+    ].join('');
+};
+
+transform['if_else'] = function (node) {
+    return [
+        transform(node['if']), '\n',
+        indent(), transform(node['else'])
+    ].join('');
+};
+
 transform[','] = function (node) {
     var left = transform(node.left);
     var right = transform(node.right);

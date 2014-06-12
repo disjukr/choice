@@ -3,7 +3,7 @@ var parser = new Parser(require('./choice.json'));
 require('fs').writeFileSync(__dirname + '/temp.js', parser.generate());
 
 console.log('===== SOURCE =====');
-var source = '1 * +2 / 3 % -4;';
+var source = 'if (true) 1; else if true {2;}';
 console.log(source);
 
 console.log('===== AST =====');

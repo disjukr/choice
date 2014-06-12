@@ -67,8 +67,7 @@
         "statement": [
             ["var_statement", "$$ = $1"],
             ["val_statement", "$$ = $1"],
-            ["if_statement", "$$ = $1"],
-            ["else_statement", "$$ = $1"],
+            ["if_else_statement", "$$ = $1"],
             ["loop_statement", "$$ = $1"],
             ["while_statement", "$$ = $1"],
             ["for_statement", "$$ = $1"],
@@ -278,6 +277,13 @@
         "else_statement": [
             ["ELSE block_statements", "$$ = {type: 'else', statements: $2}"],
             ["ELSE statement", "$$ = {type: 'else', statements: [$2]}"]
+        ],
+        "if_else_statement": [
+            ["if_statement", "$$ = $1"],
+            [
+                "if_statement else_statement",
+                "$$ = {type: 'if_else', 'if': $1, 'else': $2}"
+            ]
         ],
         "loop_statement": [
             [
