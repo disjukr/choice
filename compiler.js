@@ -20,22 +20,26 @@ function transform(node) {
 function indent(op) {
     switch (op) {
     case '+':
-        ++indent.level;
-        return indent();
+        return indent(++indent.level);
     case '-':
-        var keep = indent();
-        --indent.level;
-        return keep;
+        return indent(indent.level--);
+    case '>':
+        return indent(indent.level + 1);
+    case '<':
+        return indent(indent.level - 1);
     case '{': case '(': case '[':
         ++indent.level;
         return op + '\n';
     case '}': case ')': case ']':
         --indent.level;
         return indent() + op;
+    case undefined:
+        return indent(indent.level);
     default:
-        return (new Array(indent.level + 1)).join('  ');
+        return (new Array(Math.max(0, (op | 0) + 1))).join(indent.unit);
     }
 }
+indent.unit = '  ';
 indent.level = 0;
 
 transform['access'] = function (node) {
@@ -132,6 +136,66 @@ transform['if_else'] = function (node) {
     return [
         transform(node['if']), '\n',
         indent(), transform(node['else'])
+    ].join('');
+};
+
+transform['break'] = function (node) {
+    return 'break';
+};
+
+transform['break_label'] = function (node) {
+    return 'break ' + node.label;
+};
+
+transform['conditional_break'] = function (node) {
+    return [
+        'if (', transform(node.condition), ') ', '\n',
+        indent('>'), 'break'
+    ].join('');
+};
+
+transform['conditional_break_label'] = function (node) {
+    return [
+        'if (', transform(node.condition), ') ', '\n',
+        indent('>'), 'break ', node.label
+    ].join('');
+};
+
+transform['continue'] = function (node) {
+    return 'continue';
+};
+
+transform['continue_label'] = function (node) {
+    return 'continue ' + node.label;
+};
+
+transform['conditional_continue'] = function (node) {
+    return [
+        'if (', transform(node.condition), ') ', '\n',
+        indent('>'), 'continue'
+    ].join('');
+};
+
+transform['conditional_continue_label'] = function (node) {
+    return [
+        'if (', transform(node.condition), ') ', '\n',
+        indent('>'), 'continue ', node.label
+    ].join('');
+};
+
+transform['loop'] = function (node) {
+    return [
+        'while (true) ', indent('{'),
+            transform(node.statements),
+        indent('}')
+    ].join('');
+};
+
+transform['labeled_loop'] = function (node) {
+    return [
+        node.label + ': while (true) ', indent('{'),
+            transform(node.statements),
+        indent('}')
     ].join('');
 };
 

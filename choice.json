@@ -22,6 +22,8 @@
             ["null", "return 'NULL'"],
             ["undefined", "return 'UNDEFINED'"],
             ["returns?|->", "return 'RETURN'"],
+            ["break", "return 'BREAK'"],
+            ["continue", "return 'CONTINUE'"],
             ["typeof", "return 'TYPEOF'"],
             ["[$_A-Za-z][$_0-9A-Za-z]*", "return 'IDENTIFIER'"],
             ["\\s+", ""],
@@ -68,6 +70,8 @@
             ["var_statement", "$$ = $1"],
             ["val_statement", "$$ = $1"],
             ["if_else_statement", "$$ = $1"],
+            ["break_statement", "$$ = $1"],
+            ["continue_statement", "$$ = $1"],
             ["loop_statement", "$$ = $1"],
             ["while_statement", "$$ = $1"],
             ["for_statement", "$$ = $1"],
@@ -285,6 +289,36 @@
                 "$$ = {type: 'if_else', 'if': $1, 'else': $2}"
             ]
         ],
+        "break_statement": [
+            ["BREAK ;", "$$ = {type: 'break'}"],
+            [
+                "BREAK IDENTIFIER ;",
+                "$$ = {type: 'break_label', label: $2}"
+            ],
+            [
+                "BREAK IF expression ;",
+                "$$ = {type: 'conditional_break', condition: $3}"
+            ],
+            [
+                "BREAK IDENTIFIER IF expression ;",
+                "$$ = {type: 'conditional_break_label', label: $2, condition: $4}"
+            ]
+        ],
+        "continue_statement": [
+            ["CONTINUE ;", "$$ = {type: 'continue'}"],
+            [
+                "CONTINUE IDENTIFIER ;",
+                "$$ = {type: 'continue_label', label: $2}"
+            ],
+            [
+                "CONTINUE IF expression ;",
+                "$$ = {type: 'conditional_continue', condition: $3}"
+            ],
+            [
+                "CONTINUE IDENTIFIER IF expression ;",
+                "$$ = {type: 'conditional_continue_label', label: $2, condition: $4}"
+            ]
+        ],
         "loop_statement": [
             [
                 "LOOP block_statements",
@@ -293,6 +327,10 @@
             [
                 "LOOP statement",
                 "$$ = {type: 'loop', statements: [$2]}"
+            ],
+            [
+                "LOOP IDENTIFIER block_statements",
+                "$$ = {type: 'labeled_loop', label: $2, statements: $3}"
             ]
         ],
         "while_statement": [
