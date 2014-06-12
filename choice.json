@@ -14,17 +14,18 @@
             ["true|false", "return 'BOOLEAN'"],
             ["var\\b", "return 'VAR'"],
             ["val\\b", "return 'VAL'"],
+            ["func\\b", "return 'FUNC'"],
             ["if\\b", "return 'IF'"],
             ["else\\b", "return 'ELSE'"],
             ["loop\\b", "return 'LOOP'"],
             ["while\\b", "return 'WHILE'"],
             ["for\\b", "return 'FOR'"],
-            ["null", "return 'NULL'"],
-            ["undefined", "return 'UNDEFINED'"],
-            ["returns?|->", "return 'RETURN'"],
-            ["break", "return 'BREAK'"],
-            ["continue", "return 'CONTINUE'"],
-            ["typeof", "return 'TYPEOF'"],
+            ["null\\b", "return 'NULL'"],
+            ["undefined\\b", "return 'UNDEFINED'"],
+            ["returns?\\b|->", "return 'RETURN'"],
+            ["break\\b", "return 'BREAK'"],
+            ["continue\\b", "return 'CONTINUE'"],
+            ["typeof\\b", "return 'TYPEOF'"],
             ["[$_A-Za-z][$_0-9A-Za-z]*", "return 'IDENTIFIER'"],
             ["\\s+", ""],
             ["(?:\\/\\/|#).*(?=\\r\\n|\\n|$)", ""],
@@ -70,6 +71,7 @@
         "statement": [
             ["var_statement", "$$ = $1"],
             ["val_statement", "$$ = $1"],
+            ["func_statement", "$$ = $1"],
             ["if_else_statement", "$$ = $1"],
             ["break_statement", "$$ = $1"],
             ["continue_statement", "$$ = $1"],
@@ -245,20 +247,28 @@
         ],
         "lambda_literal": [
             [
-                "( ) RETURN expression_without_comma",
-                "$$ = {type: 'lambda', parameters: [], expression: $4}"
+                "FUNC RETURN expression_without_comma",
+                "$$ = {type: 'lambda', parameters: [], expression: $3}"
             ],
             [
-                "( parameters ) RETURN expression_without_comma",
-                "$$ = {type: 'lambda', parameters: $2, expression: $5}"
+                "FUNC ( ) RETURN expression_without_comma",
+                "$$ = {type: 'lambda', parameters: [], expression: $5}"
             ],
             [
-                "( parameters ) block_statements",
-                "$$ = {type: 'block_lambda', parameters: $2, statements: $4}"
+                "FUNC ( parameters ) RETURN expression_without_comma",
+                "$$ = {type: 'lambda', parameters: $3, expression: $6}"
             ],
             [
-                "( ) block_statements",
-                "$$ = {type: 'block_lambda', parameters: [], statements: $3}"
+                "FUNC block_statements",
+                "$$ = {type: 'block_lambda', parameters: [], statements: $2}"
+            ],
+            [
+                "FUNC ( ) block_statements",
+                "$$ = {type: 'block_lambda', parameters: [], statements: $4}"
+            ],
+            [
+                "FUNC ( parameters ) block_statements",
+                "$$ = {type: 'block_lambda', parameters: $3, statements: $5}"
             ]
         ],
         "var_statement": [
@@ -279,6 +289,32 @@
             [
                 "VAL IDENTIFIER = expression ;",
                 "$$ = {type: 'val', name: $2, value: $4}"
+            ]
+        ],
+        "func_statement": [
+            [
+                "FUNC IDENTIFIER RETURN expression ;",
+                "$$ = {type: 'func', name: $2, parameters: [], expression: $4}"
+            ],
+            [
+                "FUNC IDENTIFIER ( ) RETURN expression ;",
+                "$$ = {type: 'func', name: $2, parameters: [], expression: $6}"
+            ],
+            [
+                "FUNC IDENTIFIER ( parameters ) RETURN expression ;",
+                "$$ = {type: 'func', name: $2, parameters: $4, expression: $7}"
+            ],
+            [
+                "FUNC IDENTIFIER block_statements",
+                "$$ = {type: 'block_func', name: $2, parameters: [], statements: $3}"
+            ],
+            [
+                "FUNC IDENTIFIER ( ) block_statements",
+                "$$ = {type: 'block_func', name: $2, parameters: [], statements: $5}"
+            ],
+            [
+                "FUNC IDENTIFIER ( parameters ) block_statements",
+                "$$ = {type: 'block_func', name: $2, parameters: $4, statements: $6}"
             ]
         ],
         "if_statement": [

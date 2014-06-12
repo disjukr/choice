@@ -122,6 +122,8 @@ transform['lambda'] = function (node) {
     ].join('');
 };
 
+// todo: block lambda
+
 transform['var'] = function (node) {
     return [
         'var ', node.name, ' = ', transform(node.value)
@@ -133,6 +135,19 @@ transform['val'] = function (node) {
         'const ', node.name, ' = ', transform(node.value)
     ].join('');
 };
+
+transform['func'] = function (node) {
+    var name = node.name;
+    var parameters = node.parameters.map(transform).join(', ');
+    var result = transform(node.expression);
+    return [
+        'function ', name, '(', parameters, ') ', indent('{'),
+            indent(), 'return ', result, ';\n',
+        indent('}')
+    ].join('');
+};
+
+// todo: block func
 
 transform['if'] = function (node) {
     return [
