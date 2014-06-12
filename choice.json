@@ -174,7 +174,7 @@
         "multiplicative_expression": [
             ["prefix_expression", "$$ = $1"],
             [
-                "multiplicative_expression prefix_expression",
+                "primary_expression primary_expression",
                 "$$ = {type: '*', left: $1, right: $2}"
             ],
             [
@@ -190,8 +190,19 @@
                 "$$ = {type: '%', left: $1, right: $3}"
             ]
         ],
+        "additive_expression": [
+            ["multiplicative_expression", "$$ = $1"],
+            [
+                "additive_expression + multiplicative_expression",
+                "$$ = {type: '+', left: $1, right: $3}"
+            ],
+            [
+                "additive_expression - multiplicative_expression",
+                "$$ = {type: '-', left: $1, right: $3}"
+            ]
+        ],
         "expression_without_comma": [
-            ["multiplicative_expression", "$$ = $1"]
+            ["additive_expression", "$$ = $1"]
         ],
         "expression": [
             ["expression_without_comma", "$$ = $1"],

@@ -310,3 +310,11 @@ transform['/'] = function (node) {
 transform['%'] = function (node) {
     return transform(node.left) + ' % ' + transform(node.right);
 };
+
+transform['+'] = function (node) {
+    return transform(node.left) + ' + ' + transform(node.right);
+};
+
+transform['-'] = function (node) {
+    return transform(node.left) + ' - ' + transform(node.right);
+};
