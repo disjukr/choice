@@ -71,6 +71,7 @@
         "statement": [
             ["var_statement", "$$ = $1"],
             ["val_statement", "$$ = $1"],
+            ["return_statement", "$$ = $1"],
             ["func_statement", "$$ = $1"],
             ["if_else_statement", "$$ = $1"],
             ["break_statement", "$$ = $1"],
@@ -96,16 +97,16 @@
         "access_call_expression": [
             ["primary_expression", "$$ = $1"],
             [
+                "access_call_expression ` [ expression ]",
+                "$$ = {type: 'choice_access', expression: $1, field: $4}"
+            ],
+            [
                 "access_call_expression ` STRING",
                 "$$ = {type: 'choice_access', expression: $1, field: $3}"
             ],
             [
                 "access_call_expression ` IDENTIFIER",
                 "$$ = {type: 'choice_access', expression: $1, field: '\"' + $3 + '\"'}"
-            ],
-            [
-                "access_call_expression ` [ expression ]",
-                "$$ = {type: 'choice_access', expression: $1, field: $4}"
             ],
             [
                 "access_call_expression [ expression ]",
@@ -289,6 +290,21 @@
             [
                 "VAL IDENTIFIER = expression ;",
                 "$$ = {type: 'val', name: $2, value: $4}"
+            ]
+        ],
+        "return_statement": [
+            ["RETURN ;", "$$ = {type: 'return'}"],
+            [
+                "RETURN expression ;",
+                "$$ = {type: 'return_value', value: $2}"
+            ],
+            [
+                "RETURN IF expression ;",
+                "$$ = {type: 'conditional_return', condition: $3}"
+            ],
+            [
+                "RETURN expression IF expression ;",
+                "$$ = {type: 'conditional_return_value', value: $2, condition: $4}"
             ]
         ],
         "func_statement": [

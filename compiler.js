@@ -122,7 +122,14 @@ transform['lambda'] = function (node) {
     ].join('');
 };
 
-// todo: block lambda
+transform['block_lambda'] = function (node) {
+    var parameters = node.parameters.map(transform).join(', ');
+    return [
+        '(', 'function (', parameters, ') ', indent('{'),
+            transform(node.statements),
+        indent('}'), ')'
+    ].join('');
+};
 
 transform['var'] = function (node) {
     return [
@@ -136,6 +143,14 @@ transform['val'] = function (node) {
     ].join('');
 };
 
+transform['return'] = function (node) {
+    return 'return';
+};
+
+transform['return_value'] = function (node) {
+    return 'return ' + transform(node.value);
+};
+
 transform['func'] = function (node) {
     var name = node.name;
     var parameters = node.parameters.map(transform).join(', ');
@@ -147,7 +162,15 @@ transform['func'] = function (node) {
     ].join('');
 };
 
-// todo: block func
+transform['block_func'] = function (node) {
+    var name = node.name;
+    var parameters = node.parameters.map(transform).join(', ');
+    return [
+        'function ', name, '(', parameters, ') ', indent('{'),
+            transform(node.statements),
+        indent('}')
+    ].join('');
+};
 
 transform['if'] = function (node) {
     return [
