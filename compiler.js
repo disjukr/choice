@@ -47,6 +47,62 @@ function indent(op) {
 indent.unit = '  ';
 indent.level = 0;
 
+function unary(type) {
+    transform[type] = function (node) {
+        return [
+            '(', type, ' ', transform(node.expression), ')'
+        ].join('');
+    };
+}
+
+function prefix(type) {
+    transform['pre' + type] = function (node) {
+        return [
+            '(', type, ' ', transform(node.expression), ')'
+        ].join('');
+    };
+}
+
+function postfix(type) {
+    transform['post' + type] = function (node) {
+        return [
+            '(', transform(node.expression), ' ', type, ')'
+        ].join('');
+    };
+}
+
+function infix(type) {
+    transform[type] = function (node) {
+        return [
+            '(',
+                transform(node.left),
+                ' ', type, ' ',
+                transform(node.right),
+            ')'
+        ].join('');
+    };
+}
+
+['typeof'].forEach(unary);
+['~', '!', '+', '-', '++', '--'].forEach(prefix);
+['++', '--'].forEach(postfix);
+[
+    ',',
+    '*', '/', '%',
+    '+', '-',
+    '<<', '>>', '>>>',
+    '<', '>', '<=', '>=',
+    'instanceof', 'in',
+    '==', '!=', '===', '!==',
+    '&', '^', '|',
+    '&&', '||',
+    "=",
+    "*=", "/=", "%=",
+    "+=", "-=",
+    "<<=", ">>=", ">>>=",
+    "&=", "^=", "|="
+].forEach(infix);
+
 transform['choice_access'] = function (node) {
     compile.choice_access = true;
     var access = transform(node.expression);
@@ -71,20 +127,32 @@ transform['choice_access'] = function (node) {
 transform['access'] = function (node) {
     var access = transform(node.expression);
     var field = transform(node.field);
-    return access + '[' + field + ']';
+    return [
+        '(', access, '[', field, ']', ')'
+    ].join('');
 };
 
 transform['dot_access'] = function (node) {
     var access = transform(node.expression);
     var field = transform(node.field);
-    return access + '.' + field;
+    return [
+        '(', access, '.', field, ')'
+    ].join('');
 };
 
 transform['call'] = function (node) {
     var callee = transform(node.callee);
     var arguments = node.arguments.map(transform).join(',');
     return [
-        callee, '(', arguments, ')'
+        '(', callee, '(', arguments, ')', ')'
+    ].join('');
+};
+
+transform['new'] = function (node) {
+    var expression = transform(node.expression);
+    var arguments = node.arguments.map(transform).join(',');
+    return [
+        '(', 'new ', expression, '(', arguments, ')', ')'
     ].join('');
 };
 
@@ -255,78 +323,12 @@ transform['labeled_loop'] = function (node) {
     ].join('');
 };
 
-transform[','] = function (node) {
-    var left = transform(node.left);
-    var right = transform(node.right);
-    return left + ', ' + right;
-};
-
-transform['typeof'] = function (node) {
+transform['ternary'] = function (node) {
     return [
-        '(', 'typeof ', transform(node.expression), ')'
+        '(',
+            transform(node.condition), '?',
+            transform(node['true']), ':',
+            transform(node['false']),
+        ')'
     ].join('');
-};
-
-transform['pre~'] = function (node) {
-    return '~' + transform(node.expression);
-};
-
-transform['pre!'] = function (node) {
-    return '!' + transform(node.expression);
-};
-
-transform['pre+'] = function (node) {
-    return '+' + transform(node.expression);
-};
-
-transform['pre-'] = function (node) {
-    return '-' + transform(node.expression);
-};
-
-transform['pre++'] = function (node) {
-    return '++' + transform(node.expression);
-};
-
-transform['pre--'] = function (node) {
-    return '--' + transform(node.expression);
-};
-
-transform['post++'] = function (node) {
-    return transform(node.expression) + '++';
-};
-
-transform['post--'] = function (node) {
-    return transform(node.expression) + '--';
-};
-
-transform['*'] = function (node) {
-    return transform(node.left) + ' * ' + transform(node.right);
-};
-
-transform['/'] = function (node) {
-    return transform(node.left) + ' / ' + transform(node.right);
-};
-
-transform['%'] = function (node) {
-    return transform(node.left) + ' % ' + transform(node.right);
-};
-
-transform['+'] = function (node) {
-    return transform(node.left) + ' + ' + transform(node.right);
-};
-
-transform['-'] = function (node) {
-    return transform(node.left) + ' - ' + transform(node.right);
-};
-
-transform['<<'] = function (node) {
-    return transform(node.left) + ' << ' + transform(node.right);
-};
-
-transform['>>'] = function (node) {
-    return transform(node.left) + ' >> ' + transform(node.right);
-};
-
-transform['>>>'] = function (node) {
-    return transform(node.left) + ' >>> ' + transform(node.right);
 };

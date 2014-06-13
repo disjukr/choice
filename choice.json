@@ -13,8 +13,8 @@
             ["\\/(?![\\s=])[^[\\/\\n\\\\]*(?:(?:\\\\[\\s\\S]|\\[[^\\]\\n\\\\]*(?:\\\\[\\s\\S][^\\]\\n\\\\]*)*])[^[\\/\\n\\\\]*)*\\/[gimy]{0,4}", "return 'REGEX'"],
             ["true|false", "return 'BOOLEAN'"],
             ["var\\b", "return 'VAR'"],
-            ["val\\b", "return 'VAL'"],
-            ["func\\b", "return 'FUNC'"],
+            ["val\\b|const\\b", "return 'VAL'"],
+            ["func(?:tion)?\\b", "return 'FUNC'"],
             ["if\\b", "return 'IF'"],
             ["else\\b", "return 'ELSE'"],
             ["loop\\b", "return 'LOOP'"],
@@ -25,11 +25,25 @@
             ["returns?\\b|->", "return 'RETURN'"],
             ["break\\b", "return 'BREAK'"],
             ["continue\\b", "return 'CONTINUE'"],
+            ["new\\b", "return 'NEW'"],
             ["typeof\\b", "return 'TYPEOF'"],
+            ["instanceof\\b", "return 'INSTANCEOF'"],
+            ["in\\b", "return 'IN'"],
             ["[$_A-Za-z][$_0-9A-Za-z]*", "return 'IDENTIFIER'"],
             ["\\s+", ""],
             ["(?:\\/\\/|#).*(?=\\r\\n|\\n|$)", ""],
             ["\\/\\*([^*]|[\\r\\n]|(\\*+([^*/]|[\\r\\n])))*\\*+\\/", ""],
+            ["\\*=", "return '*='"],
+            ["/=", "return '/='"],
+            ["%=", "return '%='"],
+            ["\\+=", "return '+='"],
+            ["-=", "return '-='"],
+            ["<<=", "return '<<='"],
+            [">>>=", "return '>>>='"],
+            [">>=", "return '>>='"],
+            ["&=", "return '&='"],
+            ["\\^=", "return '^='"],
+            ["\\|=", "return '|='"],
             ["\\*", "return '*'"],
             ["/", "return '/'"],
             ["%", "return '%'"],
@@ -51,6 +65,11 @@
             ["<<", "return '<<'"],
             ["<=", "return '<='"],
             ["<", "return '<'"],
+            ["&&", "return '&&'"],
+            ["&", "return '&'"],
+            ["\\|\\|", "return '||'"],
+            ["\\|", "return '|'"],
+            ["\\^", "return '^'"],
             ["\\{", "return '{'"],
             ["\\}", "return '}'"],
             ["\\[", "return '['"],
@@ -129,8 +148,23 @@
                 "$$ = {type: 'call', callee: $1, arguments: $3}"
             ]
         ],
-        "postfix_expression": [
+        "new_expression": [
             ["access_call_expression", "$$ = $1"],
+            [
+                "NEW access_call_expression",
+                "$$ = {type: 'new', expression: $2, arguments: []}"
+            ],
+            [
+                "NEW access_call_expression ( )",
+                "$$ = {type: 'new', expression: $2, arguments: []}"
+            ],
+            [
+                "NEW access_call_expression ( arguments )",
+                "$$ = {type: 'new', expression: $2, arguments: $4}"
+            ]
+        ],
+        "postfix_expression": [
+            ["new_expression", "$$ = $1"],
             [
                 "postfix_expression ++",
                 "$$ = {type: 'post++', expression: $1}"
@@ -216,8 +250,117 @@
                 "$$ = {type: '>>>', left: $1, right: $3}"
             ]
         ],
+        "relational_expression": [
+            ["shift_expression", "$$ = $1"],
+            [
+                "relational_expression < shift_expression",
+                "$$ = {type: '<', left: $1, right: $3}"
+            ],
+            [
+                "relational_expression > shift_expression",
+                "$$ = {type: '>', left: $1, right: $3}"
+            ],
+            [
+                "relational_expression <= shift_expression",
+                "$$ = {type: '<=', left: $1, right: $3}"
+            ],
+            [
+                "relational_expression >= shift_expression",
+                "$$ = {type: '>=', left: $1, right: $3}"
+            ],
+            [
+                "relational_expression INSTANCEOF shift_expression",
+                "$$ = {type: 'instanceof', left: $1, right: $3}"
+            ],
+            [
+                "relational_expression IN shift_expression",
+                "$$ = {type: 'in', left: $1, right: $3}"
+            ]
+        ],
+        "equality_expression": [
+            ["relational_expression", "$$ = $1"],
+            [
+                "equality_expression == relational_expression",
+                "$$ = {type: '==', left: $1, right: $3}"
+            ],
+            [
+                "equality_expression != relational_expression",
+                "$$ = {type: '!=', left: $1, right: $3}"
+            ],
+            [
+                "equality_expression === relational_expression",
+                "$$ = {type: '===', left: $1, right: $3}"
+            ],
+            [
+                "equality_expression !== relational_expression",
+                "$$ = {type: '!==', left: $1, right: $3}"
+            ]
+        ],
+        "bitwise_and_expression": [
+            ["equality_expression", "$$ = $1"],
+            [
+                "bitwise_and_expression & equality_expression",
+                "$$ = {type: '&', left: $1, right: $3}"
+            ]
+        ],
+        "bitwise_xor_expression": [
+            ["bitwise_and_expression", "$$ = $1"],
+            [
+                "bitwise_xor_expression ^ bitwise_and_expression",
+                "$$ = {type: '^', left: $1, right: $3}"
+            ]
+        ],
+        "bitwise_or_expression": [
+            ["bitwise_xor_expression", "$$ = $1"],
+            [
+                "bitwise_or_expression | bitwise_xor_expression",
+                "$$ = {type: '|', left: $1, right: $3}"
+            ]
+        ],
+        "logical_and_expression": [
+            ["bitwise_or_expression", "$$ = $1"],
+            [
+                "logical_and_expression && bitwise_or_expression",
+                "$$ = {type: '&&', left: $1, right: $3}"
+            ]
+        ],
+        "logical_or_expression": [
+            ["logical_and_expression", "$$ = $1"],
+            [
+                "logical_or_expression || logical_and_expression",
+                "$$ = {type: '||', left: $1, right: $3}"
+            ]
+        ],
+        "ternary_expression": [
+            ["logical_or_expression", "$$ = $1"],
+            [
+                "logical_or_expression ? expression : ternary_expression",
+                "$$ = {type: 'ternary', condition: $1, 'true': $3, 'false': $5}"
+            ]
+        ],
+        "assignment_operator": [
+            ["=", "$$ = $1"],
+            ["*=", "$$ = $1"],
+            ["/=", "$$ = $1"],
+            ["%=", "$$ = $1"],
+            ["+=", "$$ = $1"],
+            ["-=", "$$ = $1"],
+            ["<<=", "$$ = $1"],
+            [">>=", "$$ = $1"],
+            [">>>=", "$$ = $1"],
+            ["&=", "$$ = $1"],
+            ["^=", "$$ = $1"],
+            ["|=", "$$ = $1"]
+        ],
+        "assignment_expression": [
+            ["ternary_expression", "$$ = $1"],
+            [
+                "primary_expression assignment_operator assignment_expression",
+                "$$ = {type: $2, left: $1, right: $3}"
+            ]
+        ],
         "expression_without_comma": [
-            ["shift_expression", "$$ = $1"]
+            ["assignment_expression", "$$ = $1"]
         ],
         "expression": [
             ["expression_without_comma", "$$ = $1"],
