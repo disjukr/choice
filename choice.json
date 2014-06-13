@@ -174,7 +174,7 @@
         "multiplicative_expression": [
             ["prefix_expression", "$$ = $1"],
             [
-                "primary_expression primary_expression",
+                "multiplicative_expression primary_expression",
                 "$$ = {type: '*', left: $1, right: $2}"
             ],
             [
