@@ -81,7 +81,10 @@
             [";", "return ';'"],
             ["\\,", "return ','"],
             ["\\.", "return '.'"],
-            ["`", "return '`'"]
+            ["`", "return '`'"],
+            ["@0", "return 'CALLEE'"],
+            ["@([1-9][0-9]*)", "return 'ARGUMENT'"],
+            ["@", "return 'ARGUMENTS'"]
         ]
     },
     "start": "ast",
@@ -111,7 +114,13 @@
         "primary_expression": [
             ["IDENTIFIER", "$$ = $1"],
             ["value", "$$ = $1"],
-            ["( expression )", "$$ = $2"]
+            ["( expression )", "$$ = $2"],
+            ["CALLEE", "$$ = 'arguments.callee'"],
+            [
+                "ARGUMENT",
+                "$$ = {type: 'argument', index: $1.substr(1)}"
+            ],
+            ["ARGUMENTS", "$$ = 'arguments'"]
         ],
         "access_call_expression": [
             ["primary_expression", "$$ = $1"],

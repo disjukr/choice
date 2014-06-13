@@ -332,3 +332,9 @@ transform['ternary'] = function (node) {
         ')'
     ].join('');
 };
+
+transform['argument'] = function (node) {
+    return [
+        '(arguments[', (node.index | 0) - 1, '])'
+    ].join('');
+};
