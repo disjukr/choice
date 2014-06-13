@@ -201,8 +201,23 @@
                 "$$ = {type: '-', left: $1, right: $3}"
             ]
         ],
+        "shift_expression": [
+            ["additive_expression", "$$ = $1"],
+            [
+                "shift_expression << additive_expression",
+                "$$ = {type: '<<', left: $1, right: $3}"
+            ],
+            [
+                "shift_expression >> additive_expression",
+                "$$ = {type: '>>', left: $1, right: $3}"
+            ],
+            [
+                "shift_expression >>> additive_expression",
+                "$$ = {type: '>>>', left: $1, right: $3}"
+            ]
+        ],
         "expression_without_comma": [
-            ["additive_expression", "$$ = $1"]
+            ["shift_expression", "$$ = $1"]
         ],
         "expression": [
             ["expression_without_comma", "$$ = $1"],
