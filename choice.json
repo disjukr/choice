@@ -586,12 +586,20 @@
         ],
         "while_statement": [
             [
-                "WHILE expression block_statements",
-                "$$ = {type: 'while', condition: $2, statements: $3}"
+                "WHILE ( expression ) block_statements",
+                "$$ = {type: 'while', condition: $3, statements: $5}"
             ],
             [
                 "WHILE ( expression ) statement",
                 "$$ = {type: 'while', condition: $3, statements: [$5]}"
+            ],
+            [
+                "WHILE IDENTIFIER ( expression ) block_statements",
+                "$$ = {type: 'labeled_while', label: $2, condition: $4, statements: $6}"
+            ],
+            [
+                "WHILE IDENTIFIER ( expression ) statement",
+                "$$ = {type: 'labeled_while', label: $2, condition: $4, statements: [$6]}"
             ]
         ],
         "for_statement": [

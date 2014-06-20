@@ -338,11 +338,27 @@ transform['labeled_loop'] = function (node) {
     ].join('');
 };
 
+transform['while'] = function (node) {
+    return [
+        'while (', node.condition, ') ', indent('{'),
+            transform(node.statements),
+        indent('}')
+    ].join('');
+};
+
+transform['labeled_while'] = function (node) {
+    return [
+        node.label + ': while (', node.condition, ') ', indent('{'),
+            transform(node.statements),
+        indent('}')
+    ].join('');
+};
+
 transform['ternary'] = function (node) {
     return [
         '(',
-            transform(node.condition), '?',
-            transform(node['true']), ':',
+            transform(node.condition), ' ? ',
+            transform(node['true']), ' : ',
             transform(node['false']),
         ')'
     ].join('');
