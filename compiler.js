@@ -219,6 +219,21 @@ transform['return_value'] = function (node) {
     return 'return ' + transform(node.value);
 };
 
+transform['conditional_return'] = function (node) {
+    return [
+        'if (', transform(node.condition), ') ',
+            indent('>'), 'return;'
+    ].join('');
+};
+
+transform['conditional_return_value'] = function (node) {
+    return [
+        'if (', transform(node.condition), ') ', indent('{'),
+            indent(), 'return ' + transform(node.value), ';\n',
+        indent('}')
+    ].join('');
+};
+
 transform['func'] = function (node) {
     var name = node.name;
     var parameters = node.parameters.map(transform).join(', ');
