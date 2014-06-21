@@ -182,10 +182,9 @@ transform['array'] = function (node) {
 
 transform['lambda'] = function (node) {
     var parameters = node.parameters.map(transform).join(', ');
-    var result = transform(node.expression);
     return [
         '(', 'function (', parameters, ') ', indent('{'),
-            indent(), 'return ', result, ';\n',
+            indent(), 'return ', transform(node.expression), ';\n',
         indent('}'), ')'
     ].join('');
 };
@@ -237,10 +236,9 @@ transform['conditional_return_value'] = function (node) {
 transform['func'] = function (node) {
     var name = node.name;
     var parameters = node.parameters.map(transform).join(', ');
-    var result = transform(node.expression);
     return [
         'function ', name, '(', parameters, ') ', indent('{'),
-            indent(), 'return ', result, ';\n',
+            indent(), 'return ', transform(node.expression), ';\n',
         indent('}')
     ].join('');
 };
