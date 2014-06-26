@@ -517,10 +517,6 @@
         ],
         "if_statement": [
             [
-                "IF expression block_statements",
-                "$$ = {type: 'if', condition: $2, statements: $3}"
-            ],
-            [
                 "IF ( expression ) statement",
                 "$$ = {type: 'if', condition: $3, statements: [$5]}"
             ],
