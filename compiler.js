@@ -352,6 +352,26 @@ transform['labeled_while'] = function (node) {
     ].join('');
 };
 
+transform['for'] = function (node) {
+    return [
+        'for (', node.init, '; ', node.condition, '; ', node.loop, ') ', indent('{'),
+            transform(node.statements),
+        indent('}')
+    ].join('');
+};
+
+transform['labeled_for'] = function (node) {
+    return [
+        node.label + ': for (',
+            transform(node.init), '; ',
+            transform(node.cond), '; ',
+            transform(node.loop),
+        ') ', indent('{'),
+            transform(node.statements),
+        indent('}')
+    ].join('');
+};
+
 transform['ternary'] = function (node) {
     return [
         '(',

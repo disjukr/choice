@@ -600,12 +600,28 @@
         ],
         "for_statement": [
             [
+                "FOR ( expression ; expression ; expression ) block_statements",
+                "$$ = {type: 'for', init: $3, cond: $5, loop: $7, statements: $9}"
+            ],
+            [
                 "FOR ( expression ; expression ; expression ) statement",
                 "$$ = {type: 'for', init: $3, cond: $5, loop: $7, statements: [$9]}"
             ],
             [
+                "FOR ( var_statement expression ; expression ) block_statements",
+                "$$ = {type: 'for', init: $3, cond: $4, loop: $6, statements: $8}"
+            ],
+            [
                 "FOR ( var_statement expression ; expression ) statement",
                 "$$ = {type: 'for', init: $3, cond: $4, loop: $6, statements: [$8]}"
+            ],
+            [
+                "FOR IDENTIFIER ( var_statement expression ; expression ) block_statements",
+                "$$ = {type: 'labeled_for', label: $2, init: $4, cond: $5, loop: $7, statements: $9}"
+            ],
+            [
+                "FOR IDENTIFIER ( var_statement expression ; expression ) statement",
+                "$$ = {type: 'labeled_for', label: $2, init: $4, cond: $5, loop: $7, statements: [$9]}"
             ]
         ]
     }
