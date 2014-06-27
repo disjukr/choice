@@ -372,6 +372,22 @@ transform['labeled_for'] = function (node) {
     ].join('');
 };
 
+transform['for_in'] = function (node) {
+    return [
+        'for (var ', node.key, ' in ', transform(node.object), ') ', indent('{'),
+            transform(node.statements),
+        indent('}')
+    ].join('');
+};
+
+transform['labeled_for_in'] = function (node) {
+    return [
+        node.label + ': for (var ', node.key, ' in ', transform(node.object), ') ', indent('{'),
+            transform(node.statements),
+        indent('}')
+    ].join('');
+};
+
 transform['ternary'] = function (node) {
     return [
         '(',

@@ -608,6 +608,14 @@
                 "$$ = {type: 'for', init: $3, cond: $5, loop: $7, statements: [$9]}"
             ],
             [
+                "FOR IDENTIFIER ( expression ; expression ; expression ) block_statements",
+                "$$ = {type: 'labeled_for', label: $2, init: $4, cond: $6, loop: $8, statements: $10}"
+            ],
+            [
+                "FOR IDENTIFIER ( expression ; expression ; expression ) statement",
+                "$$ = {type: 'labeled_for', label: $2, init: $4, cond: $6, loop: $8, statements: [$10]}"
+            ],
+            [
                 "FOR ( var_statement expression ; expression ) block_statements",
                 "$$ = {type: 'for', init: $3, cond: $4, loop: $6, statements: $8}"
             ],
@@ -622,6 +630,22 @@
             [
                 "FOR IDENTIFIER ( var_statement expression ; expression ) statement",
                 "$$ = {type: 'labeled_for', label: $2, init: $4, cond: $5, loop: $7, statements: [$9]}"
+            ],
+            [
+                "FOR ( VAR IDENTIFIER IN expression ) block_statements",
+                "$$ = {type: 'for_in', key: $4, object: $6, statements: $8}"
+            ],
+            [
+                "FOR ( VAR IDENTIFIER IN expression ) statement",
+                "$$ = {type: 'for_in', key: $4, object: $6, statements: [$8]}"
+            ],
+            [
+                "FOR IDENTIFIER ( VAR IDENTIFIER IN expression ) block_statements",
+                "$$ = {type: 'labeled_for_in', label: $2, key: $5, object: $7, statements: $9}"
+            ],
+            [
+                "FOR IDENTIFIER ( VAR IDENTIFIER IN expression ) statement",
+                "$$ = {type: 'labeled_for_in', label: $2, key: $5, object: $7, statements: [$9]}"
             ]
         ]
     }
