@@ -3,11 +3,15 @@ function compile(ast) {
     var fragments = [
         transform(ast)
     ];
+    if (compile.choice_temp)
+        fragments.unshift('var __choice_temp__;');
     if (compile.choice_access)
         fragments.unshift('var __choice_access__, __choice_field__, __choice_member__;');
+    compile.choice_temp = false;
     compile.choice_access = false;
     return fragments.join('\n');
 };
+compile.choice_temp = false;
 compile.choice_access = false;
 
 function transform(node) {
@@ -383,6 +387,28 @@ transform['for_in'] = function (node) {
 transform['labeled_for_in'] = function (node) {
     return [
         node.label + ': for (var ', node.key, ' in ', transform(node.object), ') ', indent('{'),
+            transform(node.statements),
+        indent('}')
+    ].join('');
+};
+
+transform['for_pair_in'] = function (node) {
+    compile.choice_temp = true;
+    return [
+        indent(), '__choice_temp__ = ', transform(node.object), ';\n',
+        'for (var ', node.key, ' in __choice_temp__) ', indent('{'),
+            indent(), 'var ', node.value, ' = __choice_temp__[', node.key, '];\n',
+            transform(node.statements),
+        indent('}')
+    ].join('');
+};
+
+transform['labeled_for_pair_in'] = function (node) {
+    compile.choice_temp = true;
+    return [
+        indent(), '__choice_temp__ = ', transform(node.object), ';\n',
+        node.label + ': for (var ', node.key, ' in __choice_temp__) ', indent('{'),
+            indent(), 'var ', node.value, ' = __choice_temp__[', node.key, '];\n',
             transform(node.statements),
         indent('}')
     ].join('');

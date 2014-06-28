@@ -646,6 +646,22 @@
             [
                 "FOR IDENTIFIER ( VAR IDENTIFIER IN expression ) statement",
                 "$$ = {type: 'labeled_for_in', label: $2, key: $5, object: $7, statements: [$9]}"
+            ],
+            [
+                "FOR ( VAR IDENTIFIER , IDENTIFIER IN expression ) block_statements",
+                "$$ = {type: 'for_pair_in', key: $4, value: $6, object: $8, statements: $10}"
+            ],
+            [
+                "FOR ( VAR IDENTIFIER , IDENTIFIER IN expression ) statement",
+                "$$ = {type: 'for_pair_in', key: $4, value: $6, object: $8, statements: [$10]}"
+            ],
+            [
+                "FOR IDENTIFIER ( VAR IDENTIFIER , IDENTIFIER IN expression ) block_statements",
+                "$$ = {type: 'labeled_for_pair_in', label: $2, key: $5, value: $7, object: $9, statements: $11}"
+            ],
+            [
+                "FOR IDENTIFIER ( VAR IDENTIFIER , IDENTIFIER IN expression ) statement",
+                "$$ = {type: 'labeled_for_pair_in', label: $2, key: $5, value: $7, object: $9, statements: [$11]}"
             ]
         ]
     }
