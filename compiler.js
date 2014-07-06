@@ -358,7 +358,11 @@ transform['labeled_while'] = function (node) {
 
 transform['for'] = function (node) {
     return [
-        'for (', node.init, '; ', node.condition, '; ', node.loop, ') ', indent('{'),
+        'for (',
+            transform(node.init), '; ',
+            transform(node.cond), '; ',
+            transform(node.loop),
+        ') ', indent('{'),
             transform(node.statements),
         indent('}')
     ].join('');
