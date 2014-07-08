@@ -6,6 +6,13 @@ var a = 123.456e+789;
 val b = 'string';
 const c = "constant";
 
+var d = match (num) {
+    1     -> 2,
+    3 ~ 4 -> 5,
+    6 | 7 -> 8,
+          -> 9
+};
+
 if (condition) statement;
 if (condition) {
     statements;
