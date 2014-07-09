@@ -7,10 +7,13 @@ val b = 'string';
 const c = "constant";
 
 var d = match (num) {
-    1     -> 2,
-    3 ~ 4 -> 5,
-    6 | 7 -> 8,
-          -> 9
+    = 1              -> 2,
+    3 ~ 4            -> 5,
+    6 | 7            -> 8,
+    (expression)     -> 9,
+    (10) ~ (11)      -> 12,
+    (13) | 14 | (15) -> 16,
+    17
 };
 
 if (condition) statement;
