@@ -28,6 +28,7 @@
             ["\\b(returns?)\\b|->", "return 'RETURN'"],
             ["\\b(break)\\b", "return 'BREAK'"],
             ["\\b(continue)\\b", "return 'CONTINUE'"],
+            ["\\b(match)\\b", "return 'MATCH'"],
             ["\\b(new)\\b", "return 'NEW'"],
             ["\\b(typeof)\\b", "return 'TYPEOF'"],
             ["\\b(instanceof)\\b", "return 'INSTANCEOF'"],
@@ -114,6 +115,7 @@
         "primary_expression": [
             ["IDENTIFIER", "$$ = $1"],
             ["value", "$$ = $1"],
+            ["match_expression", "$$ = $1"],
             ["( expression )", "$$ = $2"],
             ["CALLEE", "$$ = 'arguments.callee'"],
             [
@@ -376,6 +378,42 @@
             [
                 "expression , expression_without_comma",
                 "$$ = {type: ',', left: $1, right: $3}"
+            ]
+        ],
+        "match_expression": [
+            [
+                "MATCH ( expression ) { match_cases }",
+                "$$ = {type: 'match', input: $3, cases: $6}"
+            ]
+        ],
+        "match_cases": [
+            ["match_cases_without_tail", "$$ = $1"],
+            [
+                "match_cases_without_tail , match_tail",
+                "$1.push($3); $$ = $1"
+            ]
+        ],
+        "match_cases_without_tail": [
+            ["match_case", "$$ = [$1]"],
+            ["match_cases_without_tail , match_case", "$1.push($3); $$ = $1"]
+        ],
+        "match_case": [
+            [
+                "match_condition RETURN expression_without_comma",
+                "$$ = {type: 'case', condition: $1, expression: $3}"
+            ]
+        ],
+        "match_tail": [
+            ["expression_without_comma", "$$ = $1"]
+        ],
+        "match_condition": [
+            [
+                "= value",
+                "$$ = {type: '=', value:$2}"
+            ],
+            [
+                "value ~ value",
+                "$$ = {type: '~', left: $1, right: $3}"
             ]
         ],
         "key_value_pair": [
