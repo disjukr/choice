@@ -1,16 +1,31 @@
 exports.compile = compile;
 function compile(ast) {
-    var fragments = [
-        transform(ast)
-    ];
+    var transformed = transform(ast);
+    var vars = [];
     if (compile.choice_temp)
-        fragments.unshift('var __choice_temp__;');
+        vars.push('__choice_temp__');
+    for (var i = 0; i < compile.temp.count; ++i) {
+        vars.push('__choice_temp_' + i + '__');
+    }
     if (compile.choice_access)
-        fragments.unshift('var __choice_access__, __choice_field__, __choice_member__;');
+        vars.push(
+            '__choice_access__',
+            '__choice_field__',
+            '__choice_member__'
+        );
+    if (vars.length)
+        vars = 'var' + vars.join(',') + ';\n';
+    else
+        vars = '';
+    compile.temp.count = 0;
     compile.choice_temp = false;
     compile.choice_access = false;
-    return fragments.join('\n');
+    return vars + transformed;
 };
+compile.temp = function() {
+    return '__choice_temp_' + (compile.temp.count++) + '__';
+};
+compile.temp.count = 0;
 compile.choice_temp = false;
 compile.choice_access = false;
 
@@ -199,6 +214,42 @@ transform['block_lambda'] = function (node) {
         '(', 'function (', parameters, ') ', indent('{'),
             transform(node.statements),
         indent('}'), ')'
+    ].join('');
+};
+
+transform['match'] = function (node) {
+    var input = node.input;
+    var cases = node.cases;
+    var tail = cases.pop();
+    if (tail.type === 'match_case') {
+        cases.push(tail);
+        tail = 'undefined';
+    }
+    var temp = compile.temp();
+    return [
+        indent('('),
+        indent(), temp, ' = ', transform(input), ',\n',
+        cases.map(function (_case) {
+            var condition = _case.condition;
+            var expression = _case.expression;
+            var firstPass;
+            switch (condition.type) {
+            case '=':
+                firstPass = '(' + transform(condition.value) + ' === ' + temp + ')';
+                break;
+            case '~':
+                firstPass = [
+                    '(',
+                    temp, ' >= ', transform(condition.left), ' && ',
+                    temp, ' <= ', transform(condition.right),
+                    ')'
+                ].join('');
+                break;
+            }
+            return indent() + firstPass + ' ? ' + expression + ' :';
+        }).join('\n'),
+        ' ', transform(tail), '\n',
+        indent(')')
     ].join('');
 };
 

@@ -400,7 +400,7 @@
         "match_case": [
             [
                 "match_condition RETURN expression_without_comma",
-                "$$ = {type: 'case', condition: $1, expression: $3}"
+                "$$ = {type: 'match_case', condition: $1, expression: $3}"
             ]
         ],
         "match_tail": [
