@@ -14,7 +14,7 @@ function compile(ast) {
             '__choice_member__'
         );
     if (vars.length)
-        vars = 'var' + vars.join(',') + ';\n';
+        vars = 'var ' + vars.join(',') + ';\n';
     else
         vars = '';
     compile.temp.count = 0;
