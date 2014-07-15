@@ -261,6 +261,17 @@ transform['match']['~'] = function (node, input) {
     ].join('');
 };
 
+transform['match']['|'] = function (node, input) {
+    var left = node.left;
+    var right = node.right;
+    return [
+        indent('('),
+        indent(), transform['match'][left.type](left, input), ' ||\n',
+        indent(), transform['match'][right.type](right, input), '\n',
+        indent(')')
+    ].join('');
+};
+
 transform['var'] = function (node) {
     return [
         'var ', node.name, ' = ', transform(node.value)

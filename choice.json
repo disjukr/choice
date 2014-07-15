@@ -414,6 +414,10 @@
             [
                 "value ~ value",
                 "$$ = {type: '~', left: $1, right: $3}"
+            ],
+            [
+                "match_condition | match_condition",
+                "$$ = {type: '|', left: $1, right: $3}"
             ]
         ],
         "key_value_pair": [
