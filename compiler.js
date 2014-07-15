@@ -18,14 +18,20 @@ function compile(ast) {
     else
         vars = '';
     compile.temp.count = 0;
+    compile.temp.recycle = [];
     compile.choice_temp = false;
     compile.choice_access = false;
     return vars + transformed;
 };
-compile.temp = function() {
+compile.temp = function(recycle) {
+    if (recycle)
+        return compile.temp.recycle.push(recycle);
+    if (compile.temp.recycle.length > 0)
+        return compile.temp.recycle.pop();
     return '__choice_temp_' + (compile.temp.count++) + '__';
 };
 compile.temp.count = 0;
+compile.temp.recycle = [];
 compile.choice_temp = false;
 compile.choice_access = false;
 
@@ -226,30 +232,32 @@ transform['match'] = function (node) {
         tail = 'undefined';
     }
     var temp = compile.temp();
-    return [
+    var result = [
         indent('('),
-        indent(), temp, ' = ', transform(input), ',\n',
+        indent(), temp, ' = ', transform(input), ',\n', // evaluation once
         cases.map(function (_case) {
             var condition = _case.condition;
             var expression = _case.expression;
-            var firstPass;
-            switch (condition.type) {
-            case '=':
-                firstPass = '(' + transform(condition.value) + ' === ' + temp + ')';
-                break;
-            case '~':
-                firstPass = [
-                    '(',
-                    temp, ' >= ', transform(condition.left), ' && ',
-                    temp, ' <= ', transform(condition.right),
-                    ')'
-                ].join('');
-                break;
-            }
-            return indent() + firstPass + ' ? ' + expression + ' :';
+            var firstPass = transform['match'][condition.type];
+            return indent() + firstPass(condition, temp) + ' ? ' + expression + ' :';
         }).join('\n'),
         ' ', transform(tail), '\n',
         indent(')')
+    ].join('');
+    compile.temp(temp);
+    return result;
+};
+
+transform['match']['='] = function (node, input) {
+    return '(' + transform(node.value) + ' === ' + input + ')';
+};
+
+transform['match']['~'] = function (node, input) {
+    return [
+        '(',
+            input, ' >= ', transform(node.left), ' && ',
+            input, ' <= ', transform(node.right),
+        ')'
     ].join('');
 };
 
