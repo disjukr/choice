@@ -422,6 +422,22 @@
             [
                 "{ expression }",
                 "$$ = {type: '{}', expression: $2}"
+            ],
+            [
+                "[ value , value ]",
+                "$$ = {type: '~', left: $2, right: $4}"
+            ],
+            [
+                "( value , value )",
+                "$$ = {type: '()', left: $2, right: $4}"
+            ],
+            [
+                "[ value , value )",
+                "$$ = {type: '[)', left: $2, right: $4}"
+            ],
+            [
+                "( value , value ]",
+                "$$ = {type: '(]', left: $2, right: $4}"
             ]
         ],
         "key_value_pair": [

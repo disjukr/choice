@@ -276,6 +276,33 @@ transform['match']['{}'] = function (node) {
     return '(' + transform(node.expression) + ')';
 };
 
+transform['match']['()'] = function (node, input) {
+    return [
+        '(',
+            input, ' > ', transform(node.left), ' && ',
+            input, ' < ', transform(node.right),
+        ')'
+    ].join('');
+};
+
+transform['match']['[)'] = function (node, input) {
+    return [
+        '(',
+            input, ' >= ', transform(node.left), ' && ',
+            input, ' < ', transform(node.right),
+        ')'
+    ].join('');
+};
+
+transform['match']['(]'] = function (node, input) {
+    return [
+        '(',
+            input, ' > ', transform(node.left), ' && ',
+            input, ' <= ', transform(node.right),
+        ')'
+    ].join('');
+};
+
 transform['var'] = function (node) {
     return [
         'var ', node.name, ' = ', transform(node.value)

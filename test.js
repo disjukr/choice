@@ -3,7 +3,7 @@ var parser = new Parser(require('./choice.json'));
 require('fs').writeFileSync(__dirname + '/temp.js', parser.generate());
 
 console.log('===== SOURCE =====');
-var source = 'match(1){{2}->3,4};';
+var source = 'match(1){[2,3]->4,(5,6)->7,[8,9)->10,(11,12]->13};';
 console.log(source);
 
 console.log('===== AST =====');
