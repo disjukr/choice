@@ -418,6 +418,10 @@
             [
                 "match_condition | match_condition",
                 "$$ = {type: '|', left: $1, right: $3}"
+            ],
+            [
+                "{ expression }",
+                "$$ = {type: '{}', expression: $2}"
             ]
         ],
         "key_value_pair": [

@@ -272,6 +272,10 @@ transform['match']['|'] = function (node, input) {
     ].join('');
 };
 
+transform['match']['{}'] = function (node) {
+    return '(' + transform(node.expression) + ')';
+};
+
 transform['var'] = function (node) {
     return [
         'var ', node.name, ' = ', transform(node.value)
